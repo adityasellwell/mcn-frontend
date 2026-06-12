@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+|--------------------------------------------------------------------------
+| Global Styles
+|--------------------------------------------------------------------------
+*/
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.input {
+  @apply
+  w-full
+  px-4
+  py-3
+  rounded-xl
+ bg-zinc-950
+  border
+  border-zinc-800
+  outline-none
+  text-white
+  placeholder:text-zinc-500;
+}
+
+.input:focus {
+  border-color: #0C831F;
+}
+
+.input-error {
+  @apply border-red-500;
+}
+
+.error-text {
+  @apply text-red-500 text-sm mt-1;
+}
