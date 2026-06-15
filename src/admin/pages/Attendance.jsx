@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import usePageTitle from "../../hooks/usePageTitle";
 import { ClipboardCheck, Search } from "lucide-react";
 import {
   fetchMeetingAttendance,
@@ -33,6 +34,7 @@ const AttendanceBadge = ({ status }) => {
 // Main Attendance Page
 // ─────────────────────────────────────────────
 const Attendance = () => {
+  usePageTitle("Attendance");
   const [meetings, setMeetings] = useState([]);
   const [selectedMeetingId, setSelectedMeetingId] = useState("");
   const [attendance, setAttendance] = useState({ members: [], visitors: [] });

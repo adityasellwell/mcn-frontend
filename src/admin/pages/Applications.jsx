@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import usePageTitle from "../../hooks/usePageTitle";
 import {
   Eye, CheckCircle, XCircle,
   Download, Search, Filter,
@@ -243,6 +244,7 @@ const Field = ({ label, value }) => (
 // Main Applications Page
 // ─────────────────────────────────────────────
 const Applications = () => {
+  usePageTitle("Applications");
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);

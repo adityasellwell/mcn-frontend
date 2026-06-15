@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import usePageTitle from "../../hooks/usePageTitle";
 import { Plus, Pencil, Trash2, X, Building2 } from "lucide-react";
 import {
   fetchChapters,
@@ -197,6 +198,7 @@ const ChapterModal = ({ chapter, onClose, onSave }) => {
 // Main Chapters Page
 // ─────────────────────────────────────────────
 const Chapters = () => {
+  usePageTitle("Chapters");
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);

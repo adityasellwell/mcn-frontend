@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import usePageTitle from "../../hooks/usePageTitle";
 import {
   CheckCircle, XCircle, ExternalLink,
   CreditCard, Filter, X
@@ -46,6 +47,7 @@ const TypeBadge = ({ type }) => (
 // Main Payments Page
 // ─────────────────────────────────────────────
 const Payments = () => {
+  usePageTitle("Payments");
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);

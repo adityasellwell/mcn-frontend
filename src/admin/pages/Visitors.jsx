@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import usePageTitle from "../../hooks/usePageTitle";
 import { Plus, Eye, Pencil, Trash2, X, UserCheck, ArrowRightLeft } from "lucide-react";
 import {
   fetchVisitors,
@@ -466,6 +467,7 @@ const VisitorModal = ({ visitor, members, onClose, onSave }) => {
 // Main Visitors Page
 // ─────────────────────────────────────────────
 const Visitors = () => {
+  usePageTitle("Visitors");
   const [visitors, setVisitors] = useState([]);
   const [chapters, setChapters] = useState([]);
   const [members, setMembers] = useState([]);

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import usePageTitle from "../../hooks/usePageTitle";
 import { Plus, Pencil, Eye, UserX, X, Users } from "lucide-react";
 import {
   fetchMembers,
@@ -428,6 +429,7 @@ const MemberModal = ({ member, chapters, onClose, onSave }) => {
 // Main Members Page
 // ─────────────────────────────────────────────
 const Members = () => {
+  usePageTitle("Members");
   const [members, setMembers] = useState([]);
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);

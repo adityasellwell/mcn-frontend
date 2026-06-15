@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import usePageTitle from "../../hooks/usePageTitle";
 import { Plus, Trash2, X, GitMerge, ChevronDown } from "lucide-react";
 import {
   fetchReferrals,
@@ -200,6 +201,7 @@ const CreateModal = ({ members, onClose, onSave }) => {
 // Main Referrals Page
 // ─────────────────────────────────────────────
 const Referrals = () => {
+  usePageTitle("Referrals");
   const [referrals, setReferrals] = useState([]);
   const [members, setMembers] = useState([]);
   const [stats, setStats] = useState(null);

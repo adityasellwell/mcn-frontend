@@ -1,4 +1,5 @@
 import { useState } from "react";
+import usePageTitle from "../../hooks/usePageTitle";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { loginAdmin } from "../services/authService";
@@ -6,6 +7,7 @@ import toast from "react-hot-toast";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 const AdminLogin = () => {
+  usePageTitle("Admin Login");
   const { login } = useAuth();
   const navigate = useNavigate();
 

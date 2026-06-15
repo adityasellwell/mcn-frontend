@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import usePageTitle from "../../hooks/usePageTitle";
 import {
   Users, UserCheck, Building2, CalendarDays,
   GitMerge, ClipboardList, CreditCard,
@@ -12,6 +13,7 @@ import {
 import toast from "react-hot-toast";
 
 const Dashboard = () => {
+  usePageTitle("Dashboard");
   const [overview, setOverview] = useState(null);
   const [applications, setApplications] = useState([]);
   const [meetings, setMeetings] = useState([]);

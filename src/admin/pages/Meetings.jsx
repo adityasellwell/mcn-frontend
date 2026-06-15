@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import usePageTitle from "../../hooks/usePageTitle";
 import { Plus, Pencil, Trash2, X, CalendarDays } from "lucide-react";
 import {
   fetchMeetings,
@@ -270,6 +271,7 @@ const MeetingModal = ({ meeting, chapters, onClose, onSave }) => {
 // Main Meetings Page
 // ─────────────────────────────────────────────
 const Meetings = () => {
+  usePageTitle("Meetings");
   const [meetings, setMeetings] = useState([]);
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
