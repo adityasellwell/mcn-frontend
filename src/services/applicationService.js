@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/application";
+const API_URL = `${import.meta.env.VITE_API_URL}/application`;
 
 export const createApplication = async (data) => {
   const formData = new FormData();
