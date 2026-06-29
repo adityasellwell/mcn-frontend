@@ -726,17 +726,30 @@ useEffect(() => {
             <h4 className="text-slate-900 text-lg mt-2 font-medium">
               {selectedMeeting.title}
             </h4>
-            <p className="text-slate-700 mt-1">📍 {selectedMeeting.address}</p>
+            {selectedMeeting.description && (
+              <p className="text-slate-600 mt-1 text-sm italic">
+                {selectedMeeting.description}
+              </p>
+            )}
+            <p className="text-slate-700 mt-2">📍 {selectedMeeting.address}</p>
             <p className="text-slate-700">
-              📅 {new Date(selectedMeeting.meetingDate).toLocaleDateString("en-IN")}
+              📅 {new Date(selectedMeeting.meetingDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
             </p>
             <p className="text-slate-700">
               🕒 {selectedMeeting.startTime} - {selectedMeeting.endTime}
             </p>
-            {selectedMeeting.meetingFee && (
-              <p className="text-green-700 mt-2 font-medium">
-                Registration Fee ₹{selectedMeeting.meetingFee}
-              </p>
+            <p className="text-green-700 mt-2 font-medium">
+              Registration Fee: ₹{selectedMeeting.meetingFee ? Number(selectedMeeting.meetingFee) : 1000}
+            </p>
+            {selectedMeeting.agenda && (
+              <div className="mt-3 pt-3 border-t border-green-200">
+                <span className="text-green-800 text-xs font-semibold uppercase tracking-wider block">
+                  Agenda:
+                </span>
+                <p className="text-slate-700 text-sm mt-1 whitespace-pre-line">
+                  {selectedMeeting.agenda}
+                </p>
+              </div>
             )}
           </div>
         )}
@@ -823,7 +836,7 @@ useEffect(() => {
             </h3>
 
             <p className="text-green-500 text-3xl font-bold mt-2">
-              ₹1000
+              ₹{selectedMeeting?.meetingFee ? Number(selectedMeeting.meetingFee) : 1000}
             </p>
 
             <p className="text-zinc-400 text-sm mt-2">
