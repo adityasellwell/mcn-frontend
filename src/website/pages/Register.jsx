@@ -5,7 +5,7 @@ import { createApplication } from "../../services/applicationService";
 import toast from "react-hot-toast";
 import qrImage from "../../assets/images/qr.png";
 import { getChapters } from "../../services/chapterService";
-import { getUpcomingMeeting } from "../../services/meetingService";
+import { getUpcomingMeeting, getUpcomingMeetings } from "../../services/meetingService";
 import { Trash } from "lucide-react";
 
 const Register = () => {
@@ -303,8 +303,21 @@ useEffect(() => {
       console.error(error);
     }
   };
+  const loadUpcoming = async () => {
+    try {
+      const meetingsResp = await getUpcomingMeetings();
+      const meetings = meetingsResp.data || meetingsResp;
+
+      if (Array.isArray(meetings) && meetings.length > 0) {
+        setSelectedMeeting(meetings[0]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   loadChapters();
+  loadUpcoming();
 }, []);
 
   return (

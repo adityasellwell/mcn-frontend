@@ -9,3 +9,9 @@ export const getUpcomingMeeting = async (
 
   return response.data;
 };
+
+export const getUpcomingMeetings = async () => {
+  const response = await api.get(`/dashboard/upcoming-meetings`);
+
+  return response.data;
+};
