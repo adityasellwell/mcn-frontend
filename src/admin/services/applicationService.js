@@ -17,5 +17,5 @@ export const rejectApplication = (id) =>
   api.put(`/application/${id}/reject`);
 
 // ─── Export applications as Excel ───
-export const exportApplications = () =>
-  api.get("/application/export", { responseType: "blob" });
+export const exportApplications = (params) =>
+  api.get("/application/export", { params, responseType: "blob" });

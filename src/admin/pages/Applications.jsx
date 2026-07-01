@@ -12,6 +12,7 @@ import {
   rejectApplication,
   exportApplications,
 } from "../services/applicationService";
+import { fetchMeetings } from "../services/meetingService";
 import toast from "react-hot-toast";
 
 // ─────────────────────────────────────────────
@@ -254,6 +255,8 @@ const Applications = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [meetings, setMeetings] = useState([]);
+  const [meetingFilter, setMeetingFilter] = useState("");
 
   // ─── Load Applications ───
   const loadApplications = async () => {
@@ -262,6 +265,7 @@ const Applications = () => {
       const params = {};
       if (statusFilter) params.status = statusFilter;
       if (typeFilter) params.type = typeFilter;
+      if (meetingFilter) params.meetingId = meetingFilter;
       if (search) params.search = search;
 
       const res = await fetchApplications(params);
@@ -275,8 +279,18 @@ const Applications = () => {
 
   // Reload when filters change
   useEffect(() => {
+    const loadAll = async () => {
+      try {
+        const meetingsRes = await fetchMeetings();
+        setMeetings(meetingsRes.data.data);
+      } catch {
+        // ignore meeting fetch failures for filters
+      }
+    };
+
+    loadAll();
     loadApplications();
-  }, [statusFilter, typeFilter]);
+  }, [statusFilter, typeFilter, meetingFilter]);
 
   // ─── Search on Enter ───
   const handleSearchKeyDown = (e) => {
@@ -330,7 +344,11 @@ const Applications = () => {
   // ─── Export Excel ───
   const handleExport = async () => {
     try {
-      const res = await exportApplications();
+      const params = {};
+      if (statusFilter) params.status = statusFilter;
+      if (meetingFilter) params.meetingId = meetingFilter;
+
+      const res = await exportApplications(params);
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -349,9 +367,10 @@ const Applications = () => {
     setSearch("");
     setStatusFilter("");
     setTypeFilter("");
+    setMeetingFilter("");
   };
 
-  const hasFilters = search || statusFilter || typeFilter;
+  const hasFilters = search || statusFilter || typeFilter || meetingFilter;
 
   return (
     <>
@@ -405,6 +424,20 @@ const Applications = () => {
             <option value="REJECTED">Rejected</option>
           </select>
 
+          {/* Meeting Filter */}
+          <select
+            value={meetingFilter}
+            onChange={(e) => setMeetingFilter(e.target.value)}
+            className="px-3 py-2.5 rounded-xl bg-[#162040] border border-white/10 text-sm text-white focus:outline-none focus:border-white/20 transition"
+          >
+            <option value="">All Meetings</option>
+            {meetings.map((meeting) => (
+              <option key={meeting.id} value={meeting.id}>
+                {meeting.title} ({new Date(meeting.meetingDate).toLocaleDateString("en-IN")})
+              </option>
+            ))}
+          </select>
+
           {/* Type Filter */}
           <select
             value={typeFilter}
@@ -454,6 +487,9 @@ const Applications = () => {
                       Mobile
                     </th>
                     <th className="px-5 py-4 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">
+                      Meeting
+                    </th>
+                    <th className="px-5 py-4 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">
                       Chapter
                     </th>
                     <th className="px-5 py-4 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">
@@ -490,6 +526,9 @@ const Applications = () => {
                       </td>
                       <td className="px-5 py-4 text-[#a8b8d4]">
                         {app.mobile}
+                      </td>
+                      <td className="px-5 py-4 text-[#a8b8d4]">
+                        {app.meetingId ? `#${app.meetingId}` : "—"}
                       </td>
                       <td className="px-5 py-4 text-[#a8b8d4]">
                         {app.chapterName || "—"}

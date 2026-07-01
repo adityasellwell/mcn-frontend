@@ -48,12 +48,17 @@ const MeetingModal = ({ meeting, chapters, onClose, onSave }) => {
     address:     meeting?.address     || "",
     meetingFee:  meeting?.meetingFee  || "",
     agenda:      meeting?.agenda      || "",
+    qr:          null,
   });
 
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e) => {
+    setForm({ ...form, qr: e.target.files[0] });
   };
 
   const handleSubmit = async (e) => {
@@ -67,11 +72,19 @@ const MeetingModal = ({ meeting, chapters, onClose, onSave }) => {
 
     setLoading(true);
     try {
-      const payload = {
-        ...form,
-        chapterId: Number(form.chapterId),
-        meetingFee: form.meetingFee ? Number(form.meetingFee) : null,
-      };
+      const payload = new FormData();
+      payload.append("chapterId", Number(form.chapterId));
+      payload.append("title", form.title);
+      payload.append("description", form.description);
+      payload.append("meetingDate", form.meetingDate);
+      payload.append("startTime", form.startTime);
+      payload.append("endTime", form.endTime);
+      payload.append("address", form.address);
+      payload.append("meetingFee", form.meetingFee ? Number(form.meetingFee) : "");
+      payload.append("agenda", form.agenda);
+      if (form.qr) {
+        payload.append("qr", form.qr);
+      }
 
       if (isEdit) {
         await updateMeeting(meeting.id, payload);
@@ -212,6 +225,24 @@ const MeetingModal = ({ meeting, chapters, onClose, onSave }) => {
               placeholder="1000"
               className="w-full px-4 py-2.5 rounded-xl bg-[#162040] border border-white/10 text-sm text-white placeholder-[#6b7ea3] focus:outline-none focus:border-white/20 transition"
             />
+          </div>
+
+          {/* QR Code */}
+          <div>
+            <label className="block text-xs text-[#6b7ea3] mb-1.5">
+              QR Code Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#0C831F] file:text-white"
+            />
+            {meeting?.meetingQrUrl && !form.qr && (
+              <p className="text-xs text-[#6b7ea3] mt-2">
+                Current QR will remain if no new file is selected.
+              </p>
+            )}
           </div>
 
           {/* Description */}

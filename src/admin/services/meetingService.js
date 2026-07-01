@@ -10,11 +10,19 @@ export const fetchMeetingById = (id) =>
 
 // ─── Create meeting ───
 export const createMeeting = (data) =>
-  api.post("/meeting", data);
+  api.post("/meeting", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
 // ─── Update meeting ───
 export const updateMeeting = (id, data) =>
-  api.put(`/meeting/${id}`, data);
+  api.put(`/meeting/${id}`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
 // ─── Deactivate meeting ───
 export const deleteMeeting = (id) =>
