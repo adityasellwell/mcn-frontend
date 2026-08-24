@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import usePageTitle from "../../hooks/usePageTitle";
-import { Plus, Pencil, Eye, UserX, X, Users } from "lucide-react";
+import { Plus, Pencil, Eye, UserX, X, Users, Trash2 } from "lucide-react";
 import {
   fetchMembers,
   fetchMemberById,
   createMember,
   updateMember,
   updateMemberStatus,
+  deleteMember,
 } from "../services/memberService";
 import { fetchChapters } from "../services/chapterService";
+import ConfirmModal from "../components/ConfirmModal";
 import toast from "react-hot-toast";
 
 // ─────────────────────────────────────────────
@@ -40,7 +42,7 @@ const Field = ({ label, value }) => (
 // ─────────────────────────────────────────────
 // View Member Modal
 // ─────────────────────────────────────────────
-const ViewModal = ({ member, onClose, onStatusChange }) => {
+const ViewModal = ({ member, onClose, onStatusChange, onDelete }) => {
   if (!member) return null;
 
   const handleDeactivate = async () => {
@@ -176,6 +178,13 @@ const ViewModal = ({ member, onClose, onStatusChange }) => {
               Activate
             </button>
           )}
+          <button
+            onClick={() => onDelete(member)}
+            className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white/[0.03] hover:bg-rose-500/10 text-[#6b7ea3] hover:text-rose-400 border border-white/10 hover:border-rose-500/20 text-sm font-medium transition"
+            title="Delete Permanently"
+          >
+            <Trash2 size={16} />
+          </button>
         </div>
       </div>
     </div>
@@ -436,6 +445,8 @@ const Members = () => {
   const [viewTarget, setViewTarget] = useState(null);
   const [editTarget, setEditTarget] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // ─── Load members and chapters ───
   const loadData = async () => {
@@ -485,6 +496,23 @@ const Members = () => {
   const handleStatusChange = () => {
     setViewTarget(null);
     loadData();
+  };
+
+  // ─── Delete permanently ───
+  const handleDeleteConfirmed = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+    try {
+      await deleteMember(deleteTarget.id);
+      toast.success("Member permanently deleted");
+      setDeleteTarget(null);
+      setViewTarget(null);
+      loadData();
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to delete member");
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   return (
@@ -571,6 +599,13 @@ const Members = () => {
                           >
                             <Pencil size={15} />
                           </button>
+                          <button
+                            onClick={() => setDeleteTarget(member)}
+                            className="p-1.5 rounded-lg text-[#6b7ea3] hover:text-rose-400 hover:bg-rose-500/10 transition"
+                            title="Delete Permanently"
+                          >
+                            <Trash2 size={15} />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -588,6 +623,7 @@ const Members = () => {
           member={viewTarget}
           onClose={() => setViewTarget(null)}
           onStatusChange={handleStatusChange}
+          onDelete={setDeleteTarget}
         />
       )}
 
@@ -600,6 +636,21 @@ const Members = () => {
           onSave={handleSave}
         />
       )}
+
+      {/* ── Delete Confirmation ── */}
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Delete member permanently?"
+        message={
+          deleteTarget
+            ? `This will permanently remove ${deleteTarget.firstName} ${deleteTarget.lastName || ""} (${deleteTarget.email}) and their chapter roles, meeting assignments, and referrals from the database. This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete Permanently"
+        loading={deleteLoading}
+        onConfirm={handleDeleteConfirmed}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   );
 };

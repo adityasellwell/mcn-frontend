@@ -9,6 +9,7 @@ import {
   deleteReferral,
 } from "../services/referralService";
 import { fetchMembers } from "../services/memberService";
+import ConfirmModal from "../components/ConfirmModal";
 import toast from "react-hot-toast";
 
 // ─────────────────────────────────────────────
@@ -208,6 +209,8 @@ const Referrals = () => {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // ─── Load data ───
   const loadData = async () => {
@@ -244,14 +247,18 @@ const Referrals = () => {
   };
 
   // ─── Delete referral ───
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this referral?")) return;
+  const handleDeleteConfirmed = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
     try {
-      await deleteReferral(id);
-      toast.success("Referral deleted");
+      await deleteReferral(deleteTarget.id);
+      toast.success("Referral permanently deleted");
+      setDeleteTarget(null);
       loadData();
     } catch {
       toast.error("Failed to delete referral");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -399,7 +406,7 @@ const Referrals = () => {
 
                           {/* Delete */}
                           <button
-                            onClick={() => handleDelete(referral.id)}
+                            onClick={() => setDeleteTarget(referral)}
                             className="p-1.5 rounded-lg text-[#6b7ea3] hover:text-rose-400 hover:bg-rose-500/10 transition"
                             title="Delete"
                           >
@@ -424,6 +431,21 @@ const Referrals = () => {
           onSave={() => { setModalOpen(false); loadData(); }}
         />
       )}
+
+      {/* ── Delete Confirmation ── */}
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Delete referral permanently?"
+        message={
+          deleteTarget
+            ? `This will permanently remove "${deleteTarget.title}" from the database. This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete Permanently"
+        loading={deleteLoading}
+        onConfirm={handleDeleteConfirmed}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   );
 };

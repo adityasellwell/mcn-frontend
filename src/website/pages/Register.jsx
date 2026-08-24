@@ -11,6 +11,7 @@ import { Trash } from "lucide-react";
 const Register = () => {
   usePageTitle("Register Yourself - MCN");
   const fileInputRef = useRef(null);
+  const isSubmittingRef = useRef(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [selectedMeeting, setSelectedMeeting] = useState(null);
@@ -111,6 +112,11 @@ const Register = () => {
 
 const handleSubmit = async (e) => {
   e.preventDefault();
+
+  // ─── Guard against double-click / double-Enter firing two submits
+  // before React re-renders the disabled button ───
+  if (isSubmittingRef.current) return;
+  isSubmittingRef.current = true;
 
   setErrors({});
   setLoading(true);
@@ -288,6 +294,7 @@ const handleSubmit = async (e) => {
       "Something went wrong"
     );
   } finally {
+    isSubmittingRef.current = false;
     setLoading(false);
   }
 };

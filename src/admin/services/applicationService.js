@@ -19,3 +19,7 @@ export const rejectApplication = (id) =>
 // ─── Export applications as Excel ───
 export const exportApplications = (params) =>
   api.get("/application/export", { params, responseType: "blob" });
+
+// ─── Hard delete application (permanent) ───
+export const deleteApplication = (id) =>
+  api.delete(`/application/${id}`);

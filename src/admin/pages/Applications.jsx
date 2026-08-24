@@ -3,7 +3,7 @@ import usePageTitle from "../../hooks/usePageTitle";
 import {
   Eye, CheckCircle, XCircle,
   Download, Search, Filter,
-  X, ExternalLink
+  X, ExternalLink, Trash2
 } from "lucide-react";
 import {
   fetchApplications,
@@ -11,8 +11,10 @@ import {
   approveApplication,
   rejectApplication,
   exportApplications,
+  deleteApplication,
 } from "../services/applicationService";
 import { fetchMeetings } from "../services/meetingService";
+import ConfirmModal from "../components/ConfirmModal";
 import toast from "react-hot-toast";
 
 // ─────────────────────────────────────────────
@@ -61,7 +63,7 @@ const TypeBadge = ({ type }) => {
 // ─────────────────────────────────────────────
 // View Application Modal
 // ─────────────────────────────────────────────
-const ApplicationModal = ({ application, onClose, onApprove, onReject }) => {
+const ApplicationModal = ({ application, onClose, onApprove, onReject, onDelete }) => {
   if (!application) return null;
 
   return (
@@ -226,6 +228,17 @@ const ApplicationModal = ({ application, onClose, onApprove, onReject }) => {
             </button>
           </div>
         )}
+
+        {/* Modal Footer — Delete */}
+        <div className="flex items-center gap-3 px-6 pb-6">
+          <button
+            onClick={() => onDelete(application)}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/[0.03] hover:bg-rose-500/10 text-[#6b7ea3] hover:text-rose-400 border border-white/10 hover:border-rose-500/20 text-sm font-medium transition"
+          >
+            <Trash2 size={16} />
+            Delete Permanently
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -250,6 +263,8 @@ const Applications = () => {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // ─── Filter State ───
   const [search, setSearch] = useState("");
@@ -338,6 +353,23 @@ const Applications = () => {
       );
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  // ─── Delete permanently ───
+  const handleDeleteConfirmed = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+    try {
+      await deleteApplication(deleteTarget.id);
+      toast.success("Application permanently deleted");
+      setDeleteTarget(null);
+      setSelected(null);
+      loadApplications();
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to delete application");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -577,6 +609,15 @@ const Applications = () => {
                               <XCircle size={15} />
                             </button>
                           )}
+
+                          {/* Delete */}
+                          <button
+                            onClick={() => setDeleteTarget(app)}
+                            className="p-1.5 rounded-lg text-[#6b7ea3] hover:text-rose-400 hover:bg-rose-500/10 transition"
+                            title="Delete Permanently"
+                          >
+                            <Trash2 size={15} />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -595,8 +636,24 @@ const Applications = () => {
           onClose={() => setSelected(null)}
           onApprove={handleApprove}
           onReject={handleReject}
+          onDelete={setDeleteTarget}
         />
       )}
+
+      {/* ── Delete Confirmation ── */}
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Delete application permanently?"
+        message={
+          deleteTarget
+            ? `This will permanently remove ${deleteTarget.fullName}'s application (${deleteTarget.email}) from the database. This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete Permanently"
+        loading={deleteLoading}
+        onConfirm={handleDeleteConfirmed}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   );
 };

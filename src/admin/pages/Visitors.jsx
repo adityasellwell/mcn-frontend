@@ -11,6 +11,7 @@ import {
 } from "../services/visitorService";
 import { fetchChapters } from "../services/chapterService";
 import { fetchMembers } from "../services/memberService";
+import ConfirmModal from "../components/ConfirmModal";
 import toast from "react-hot-toast";
 
 // ─────────────────────────────────────────────
@@ -222,7 +223,7 @@ const ViewModal = ({ visitor, chapters, onClose, onConvert, onDelete }) => {
               Convert to Member
             </button>
             <button
-              onClick={() => onDelete(visitor.id)}
+              onClick={() => onDelete(visitor)}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-sm font-medium transition"
             >
               <Trash2 size={16} />
@@ -476,6 +477,8 @@ const Visitors = () => {
   const [editTarget, setEditTarget] = useState(null);
   const [convertTarget, setConvertTarget] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // ─── Load all data ───
   const loadData = async () => {
@@ -511,15 +514,19 @@ const Visitors = () => {
   };
 
   // ─── Delete visitor ───
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this visitor?")) return;
+  const handleDeleteConfirmed = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
     try {
-      await deleteVisitor(id);
-      toast.success("Visitor deleted");
+      await deleteVisitor(deleteTarget.id);
+      toast.success("Visitor permanently deleted");
+      setDeleteTarget(null);
       setViewTarget(null);
       loadData();
     } catch {
       toast.error("Failed to delete visitor");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -656,7 +663,7 @@ const Visitors = () => {
           chapters={chapters}
           onClose={() => setViewTarget(null)}
           onConvert={handleConvert}
-          onDelete={handleDelete}
+          onDelete={setDeleteTarget}
         />
       )}
 
@@ -679,6 +686,21 @@ const Visitors = () => {
           onSave={handleSave}
         />
       )}
+
+      {/* ── Delete Confirmation ── */}
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Delete visitor permanently?"
+        message={
+          deleteTarget
+            ? `This will permanently remove ${deleteTarget.firstName} ${deleteTarget.lastName || ""} from the database. This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete Permanently"
+        loading={deleteLoading}
+        onConfirm={handleDeleteConfirmed}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   );
 };
