@@ -16,6 +16,7 @@ const Dashboard = () => {
   usePageTitle("Dashboard");
   const [overview, setOverview] = useState(null);
   const [applications, setApplications] = useState([]);
+  const [applicationsMeeting, setApplicationsMeeting] = useState(null);
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -29,6 +30,7 @@ const Dashboard = () => {
         ]);
         setOverview(o.data.data);
         setApplications(a.data.data);
+        setApplicationsMeeting(a.data.meeting || null);
         setMeetings(m.data.data);
       } catch (err) {
         toast.error("Failed to load dashboard data");
@@ -77,9 +79,14 @@ const Dashboard = () => {
 
       {/* Recent Applications */}
       <div className="bg-[#0f1b3d] border border-white/5 rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
+        <h3 className="text-sm font-semibold text-white mb-1 uppercase tracking-wider">
           Recent Applications
         </h3>
+        <p className="text-xs text-[#6b7ea3] mb-4">
+          {applicationsMeeting
+            ? `For the upcoming meeting — ${applicationsMeeting.title} (${new Date(applicationsMeeting.meetingDate).toLocaleDateString("en-IN")})`
+            : "No upcoming meeting scheduled"}
+        </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead>
@@ -150,7 +157,7 @@ const Dashboard = () => {
                     <td className="py-3 text-[#6b7ea3]">
                       {new Date(meeting.meetingDate).toLocaleDateString("en-IN")}
                     </td>
-                    <td className="py-3 text-[#a8b8d4]">{meeting.venue}</td>
+                    <td className="py-3 text-[#a8b8d4]">{meeting.address}</td>
                   </tr>
                 ))
               )}
