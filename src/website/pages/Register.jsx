@@ -20,6 +20,7 @@ const Register = () => {
   const [chapters, setChapters] =useState([]);
   const [fetchingMember, setFetchingMember] = useState(false);
   const [memberFetchMsg, setMemberFetchMsg] = useState("");
+  const [memberFetchStatus, setMemberFetchStatus] = useState(""); // "found" | "mismatch" | "not_found" | "error"
   const [formData, setFormData] = useState({
     chapterId: "",
     fullName: "",
@@ -117,6 +118,7 @@ const Register = () => {
 // blocks or breaks registration if it fails, times out, or finds nothing) ───
 const handleFetchMemberDetails = async () => {
   setMemberFetchMsg("");
+  setMemberFetchStatus("");
 
   if (!formData.mobile.trim() || !formData.email.trim()) {
     toast.error("Enter your phone number and email first");
@@ -127,6 +129,7 @@ const handleFetchMemberDetails = async () => {
   try {
     const res = await lookupMember(formData.mobile.trim(), formData.email.trim());
     const member = res?.data;
+    const status = res?.status || (member ? "found" : "not_found");
 
     if (member) {
       setFormData((prev) => ({
@@ -137,15 +140,34 @@ const handleFetchMemberDetails = async () => {
         businessCategory: member.businessCategory || prev.businessCategory,
         website: member.website || prev.website,
       }));
-      setMemberFetchMsg("Details found and filled in — please review before submitting.");
-      toast.success("Member details loaded");
+      toast.success(res?.message || "Member details loaded");
+    } else if (status === "mismatch") {
+      toast.error(
+        res?.message ||
+          "We found this phone number, but the email doesn't match. Please double-check and try again."
+      );
     } else {
-      setMemberFetchMsg("No existing member found for this phone + email — please fill in your details below.");
+      toast(
+        res?.message ||
+          "No existing member found for this phone number. Please fill in your details below.",
+        { icon: "ℹ️" }
+      );
     }
+
+    setMemberFetchStatus(status);
+    setMemberFetchMsg(res?.message || "");
   } catch (error) {
     // Never block the form — lookup is a convenience, not a requirement
     console.error(error);
-    setMemberFetchMsg("Couldn't fetch details right now — no problem, just fill in the form manually.");
+    const serverMsg = error?.response?.data?.message;
+    setMemberFetchStatus("error");
+    setMemberFetchMsg(
+      serverMsg ||
+        "Couldn't fetch details right now — no problem, just fill in the form manually."
+    );
+    toast.error(
+      serverMsg || "Couldn't fetch details right now. You can still fill the form manually."
+    );
   } finally {
     setFetchingMember(false);
   }
@@ -617,7 +639,17 @@ useEffect(() => {
               Details to auto-fill the rest of the form.
             </p>
             {memberFetchMsg && (
-              <p className="text-emerald-400 text-xs mt-1">{memberFetchMsg}</p>
+              <p
+                className={`text-xs mt-1 ${
+                  memberFetchStatus === "found"
+                    ? "text-emerald-400"
+                    : memberFetchStatus === "mismatch" || memberFetchStatus === "error"
+                    ? "text-red-400"
+                    : "text-yellow-400"
+                }`}
+              >
+                {memberFetchMsg}
+              </p>
             )}
           </div>
         )}
