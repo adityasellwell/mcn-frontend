@@ -6,7 +6,8 @@ import toast from "react-hot-toast";
 import qrImage from "../../assets/images/qr.png";
 import { getChapters } from "../../services/chapterService";
 import { getUpcomingMeeting, getUpcomingMeetings } from "../../services/meetingService";
-import { Trash } from "lucide-react";
+import { lookupMember } from "../../services/memberService";
+import { Trash, Search } from "lucide-react";
 
 const Register = () => {
   usePageTitle("Register Yourself - MCN");
@@ -17,6 +18,8 @@ const Register = () => {
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [registrationType, setRegistrationType] = useState("");
   const [chapters, setChapters] =useState([]);
+  const [fetchingMember, setFetchingMember] = useState(false);
+  const [memberFetchMsg, setMemberFetchMsg] = useState("");
   const [formData, setFormData] = useState({
     chapterId: "",
     fullName: "",
@@ -107,6 +110,44 @@ const Register = () => {
   } catch (error) {
     console.error(error);
     setSelectedMeeting(null);
+  }
+};
+
+// ─── Fetch existing member details by phone + email (best-effort — never
+// blocks or breaks registration if it fails, times out, or finds nothing) ───
+const handleFetchMemberDetails = async () => {
+  setMemberFetchMsg("");
+
+  if (!formData.mobile.trim() || !formData.email.trim()) {
+    toast.error("Enter your phone number and email first");
+    return;
+  }
+
+  setFetchingMember(true);
+  try {
+    const res = await lookupMember(formData.mobile.trim(), formData.email.trim());
+    const member = res?.data;
+
+    if (member) {
+      setFormData((prev) => ({
+        ...prev,
+        chapterId: member.chapterId ? String(member.chapterId) : prev.chapterId,
+        fullName: `${member.firstName || ""} ${member.lastName || ""}`.trim() || prev.fullName,
+        companyName: member.companyName || prev.companyName,
+        businessCategory: member.businessCategory || prev.businessCategory,
+        website: member.website || prev.website,
+      }));
+      setMemberFetchMsg("Details found and filled in — please review before submitting.");
+      toast.success("Member details loaded");
+    } else {
+      setMemberFetchMsg("No existing member found for this phone + email — please fill in your details below.");
+    }
+  } catch (error) {
+    // Never block the form — lookup is a convenience, not a requirement
+    console.error(error);
+    setMemberFetchMsg("Couldn't fetch details right now — no problem, just fill in the form manually.");
+  } finally {
+    setFetchingMember(false);
   }
 };
 
@@ -545,6 +586,41 @@ useEffect(() => {
               </p>
             )}
           </div>
+
+        {/* Fetch existing member details — MEMBER + chapter selected */}
+        {registrationType === "MEMBER" && formData.chapterId && (
+          <div className="md:col-span-2">
+            <button
+              type="button"
+              onClick={handleFetchMemberDetails}
+              disabled={fetchingMember}
+              className="
+                flex items-center justify-center gap-2
+                w-full sm:w-auto
+                px-4 py-2.5
+                rounded-xl
+                bg-zinc-800
+                hover:bg-zinc-700
+                disabled:opacity-60
+                disabled:cursor-not-allowed
+                text-white
+                text-sm
+                font-medium
+                transition
+              "
+            >
+              <Search size={15} />
+              {fetchingMember ? "Fetching..." : "Fetch Details"}
+            </button>
+            <p className="text-zinc-400 text-xs mt-2">
+              Already a member? Enter your phone number and email above, then click Fetch
+              Details to auto-fill the rest of the form.
+            </p>
+            {memberFetchMsg && (
+              <p className="text-emerald-400 text-xs mt-1">{memberFetchMsg}</p>
+            )}
+          </div>
+        )}
 
         {/* Business Details */}
 
