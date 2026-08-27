@@ -611,14 +611,24 @@ useEffect(() => {
 
         {/* Fetch existing member details — MEMBER + chapter selected */}
         {registrationType === "MEMBER" && formData.chapterId && (
-          <div className="md:col-span-2">
+          <div
+            className="
+              md:col-span-2
+              flex flex-col sm:flex-row sm:items-center
+              gap-3 sm:gap-4
+              border border-zinc-800
+              rounded-xl
+              p-4
+              bg-zinc-950/50
+            "
+          >
             <button
               type="button"
               onClick={handleFetchMemberDetails}
               disabled={fetchingMember}
               className="
+                shrink-0
                 flex items-center justify-center gap-2
-                w-full sm:w-auto
                 px-4 py-2.5
                 rounded-xl
                 bg-zinc-800
@@ -634,23 +644,26 @@ useEffect(() => {
               <Search size={15} />
               {fetchingMember ? "Fetching..." : "Fetch Details"}
             </button>
-            <p className="text-zinc-400 text-xs mt-2">
-              Already a member? Enter your phone number and email above, then click Fetch
-              Details to auto-fill the rest of the form.
-            </p>
-            {memberFetchMsg && (
-              <p
-                className={`text-xs mt-1 ${
-                  memberFetchStatus === "found"
-                    ? "text-emerald-400"
-                    : memberFetchStatus === "mismatch" || memberFetchStatus === "error"
-                    ? "text-red-400"
-                    : "text-yellow-400"
-                }`}
-              >
-                {memberFetchMsg}
+
+            <div className="min-w-0">
+              <p className="text-zinc-400 text-xs leading-relaxed">
+                Already a member? Enter your phone number and email above, then click
+                Fetch Details to auto-fill the rest of the form.
               </p>
-            )}
+              {memberFetchMsg && (
+                <p
+                  className={`text-xs mt-1.5 leading-relaxed ${
+                    memberFetchStatus === "found"
+                      ? "text-emerald-400"
+                      : memberFetchStatus === "mismatch" || memberFetchStatus === "error"
+                      ? "text-red-400"
+                      : "text-yellow-400"
+                  }`}
+                >
+                  {memberFetchMsg}
+                </p>
+              )}
+            </div>
           </div>
         )}
 
