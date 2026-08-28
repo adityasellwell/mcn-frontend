@@ -1,15 +1,6 @@
-import { useState, useEffect } from "react";
 import Container from "../components/ui/Container";
-import api from "../../services/api";
 
 const Footer = () => {
-  const [contact, setContact] = useState({ email: null, phone: null });
-
-  useEffect(() => {
-    api.get("/admin/contact")
-      .then((res) => setContact(res.data?.data || {}))
-      .catch(() => {});
-  }, []);
 
   return (
     <footer
@@ -193,33 +184,17 @@ const Footer = () => {
                 text-zinc-500
               "
             >
-              {contact.email ? (
-                <p>
-                  <a
-                    href={`mailto:${contact.email}`}
-                    className="hover:text-[#22C55E] transition-colors"
-                  >
-                    {contact.email}
-                  </a>
-                </p>
-              ) : (
-                <p>mcnmumbai@gmail.com</p>
-              )}
+              <p>
+                hello@mcn.com
+              </p>
 
-              {contact.phone ? (
-                <p>
-                  <a
-                    href={`tel:+91${contact.phone}`}
-                    className="hover:text-[#22C55E] transition-colors"
-                  >
-                    +91 {contact.phone}
-                  </a>
-                </p>
-              ) : (
-                <p>+91 90000 00000</p>
-              )}
+              <p>
+                +91 XXXXX XXXXX
+              </p>
 
-              <p>Mumbai, Maharashtra</p>
+              <p>
+                Mumbai, Maharashtra
+              </p>
             </div>
           </div>
         </div>
