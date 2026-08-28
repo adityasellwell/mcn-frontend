@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import { Loader2, CalendarOff } from "lucide-react";
 
 import Container from "../../components/ui/Container";
@@ -122,12 +121,12 @@ const MeetingsPreview = () => {
           )}
         </div>
 
-        {/* View All Meetings Link */}
-        {!loading && meetings.length > 0 && (
+        {/* View All Meetings — scrolls to meetings section */}
+        {!loading && meetings.length > 1 && (
           <div className="mt-12 text-center">
-            <Link to="/meetings">
+            <a href="/#meetings">
               <Button variant="secondary">View All Meetings</Button>
-            </Link>
+            </a>
           </div>
         )}
       </Container>

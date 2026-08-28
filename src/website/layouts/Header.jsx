@@ -111,7 +111,7 @@ const Header = () => {
                   whitespace-nowrap
                 "
               >
-                Meet Connect Network
+                Muslim Community Network
               </p>
             </div>
           </Link>

@@ -1,8 +1,20 @@
+import { useState, useEffect } from "react";
 import { Mail, MapPin, Phone } from "lucide-react";
-
 import Container from "../../components/ui/Container";
+import api from "../../../services/api";
 
 const Contact = () => {
+  const [contact, setContact] = useState({ email: null, phone: null });
+
+  useEffect(() => {
+    api.get("/admin/contact")
+      .then((res) => setContact(res.data?.data || {}))
+      .catch(() => {});
+  }, []);
+
+  const email = contact.email || "mcnmumbai@gmail.com";
+  const phone = contact.phone ? `+91 ${contact.phone}` : "+91 90000 00000";
+
   return (
     <section
       id="contact"
@@ -204,56 +216,39 @@ const Contact = () => {
             "
           >
             <div className="flex gap-4">
-              <Mail
-                className="
-                  text-[#22C55E]
-                "
-              />
+              <Mail className="text-[#22C55E] shrink-0 mt-0.5" />
 
               <div>
-                <h4 className="font-semibold">
-                  Email
-                </h4>
-
-                <p className="text-zinc-500">
-                  hello@mcn.com
-                </p>
+                <h4 className="font-semibold">Email</h4>
+                <a
+                  href={`mailto:${email}`}
+                  className="text-zinc-500 hover:text-[#22C55E] transition-colors break-all"
+                >
+                  {email}
+                </a>
               </div>
             </div>
 
             <div className="flex gap-4">
-              <Phone
-                className="
-                  text-[#22C55E]
-                "
-              />
+              <Phone className="text-[#22C55E] shrink-0 mt-0.5" />
 
               <div>
-                <h4 className="font-semibold">
-                  Phone
-                </h4>
-
-                <p className="text-zinc-500">
-                  +91 XXXXX XXXXX
-                </p>
+                <h4 className="font-semibold">Phone</h4>
+                <a
+                  href={`tel:${phone.replace(/\s/g, "")}`}
+                  className="text-zinc-500 hover:text-[#22C55E] transition-colors"
+                >
+                  {phone}
+                </a>
               </div>
             </div>
 
             <div className="flex gap-4">
-              <MapPin
-                className="
-                  text-[#22C55E]
-                "
-              />
+              <MapPin className="text-[#22C55E] shrink-0 mt-0.5" />
 
               <div>
-                <h4 className="font-semibold">
-                  Location
-                </h4>
-
-                <p className="text-zinc-500">
-                  Mumbai, Maharashtra
-                </p>
+                <h4 className="font-semibold">Location</h4>
+                <p className="text-zinc-500">Mumbai, Maharashtra</p>
               </div>
             </div>
           </div>

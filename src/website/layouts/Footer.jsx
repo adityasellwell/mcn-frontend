@@ -1,6 +1,16 @@
+import { useState, useEffect } from "react";
 import Container from "../components/ui/Container";
+import api from "../../services/api";
 
 const Footer = () => {
+  const [contact, setContact] = useState({ email: null, phone: null });
+
+  useEffect(() => {
+    api.get("/admin/contact")
+      .then((res) => setContact(res.data?.data || {}))
+      .catch(() => {});
+  }, []);
+
   return (
     <footer
       id="footer"
@@ -71,7 +81,7 @@ const Footer = () => {
                     text-zinc-400
                   "
                 >
-                  Meet Connect Network
+                  Muslim Community Network
                 </p>
               </div>
             </div>
@@ -85,10 +95,10 @@ const Footer = () => {
                 max-w-sm
               "
             >
-              Building meaningful business
-              relationships, referrals, and
-              networking opportunities through
-              a strong professional community.
+              Building meaningful community
+              relationships, connections, and
+              opportunities through a strong
+              professional network.
             </p>
           </div>
 
@@ -183,17 +193,33 @@ const Footer = () => {
                 text-zinc-500
               "
             >
-              <p>
-                hello@mcn.com
-              </p>
+              {contact.email ? (
+                <p>
+                  <a
+                    href={`mailto:${contact.email}`}
+                    className="hover:text-[#22C55E] transition-colors"
+                  >
+                    {contact.email}
+                  </a>
+                </p>
+              ) : (
+                <p>mcnmumbai@gmail.com</p>
+              )}
 
-              <p>
-                +91 XXXXX XXXXX
-              </p>
+              {contact.phone ? (
+                <p>
+                  <a
+                    href={`tel:+91${contact.phone}`}
+                    className="hover:text-[#22C55E] transition-colors"
+                  >
+                    +91 {contact.phone}
+                  </a>
+                </p>
+              ) : (
+                <p>+91 90000 00000</p>
+              )}
 
-              <p>
-                Mumbai, Maharashtra
-              </p>
+              <p>Mumbai, Maharashtra</p>
             </div>
           </div>
         </div>
@@ -223,7 +249,7 @@ const Footer = () => {
               text-zinc-600
             "
           >
-            © 2026 MCN. All Rights Reserved.
+            © 2026 MCN — Muslim Community Network. All Rights Reserved.
           </p>
 
           <p
@@ -232,8 +258,15 @@ const Footer = () => {
               text-zinc-600
             "
           >
-            Built for Business Networking &
-            Community Growth.
+            Built &amp; maintained by{" "}
+            <a
+              href="https://inspiringinfosys.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#22C55E] hover:underline"
+            >
+              Inspiring Infosys
+            </a>
           </p>
         </div>
       </Container>
