@@ -16,6 +16,7 @@ import Visitors from "../admin/pages/Visitors";
 import Payments from "../admin/pages/Payments";
 import Attendance from "../admin/pages/Attendance";
 import Referrals from "../admin/pages/Referrals";
+import CMS from "../admin/pages/CMS";
 
 const AppRoutes = () => {
   return (
@@ -57,6 +58,7 @@ const AppRoutes = () => {
         <Route path="payments" element={<Payments />} />
         <Route path="attendance" element={<Attendance />} />
         <Route path="referrals" element={<Referrals />} />
+        <Route path="cms" element={<CMS />} />
       </Route>
 
       {/* Catch all unknown admin routes */}

@@ -1,5 +1,6 @@
 import Layout from "../layouts/Layout";
 import Hero from "./sections/Hero";
+import CommunitySlider from "../components/ui/CommunitySlider";
 import AboutMCN from "./sections/AboutMCN";
 import HowItWorks from "./sections/HowItWorks";
 import ChapterOverview from "./sections/ChapterOverview";
@@ -12,12 +13,13 @@ import usePageTitle from "../../hooks/usePageTitle";
 const Home = () => {
 
 usePageTitle(
-  "MCN | Meet Connect Network"
+  "MCN | Muslim Community Network"
 );
 
   return (
     <Layout>
        <Hero />
+       <CommunitySlider />
        <AboutMCN />
        <HowItWorks />
        <ChapterOverview />

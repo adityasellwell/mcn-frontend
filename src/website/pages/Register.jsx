@@ -203,6 +203,11 @@ const handleSubmit = async (e) => {
         "Please select registration type";
     }
 
+    if (!formData.chapterId) {
+      validationErrors.chapterId =
+        "Please select a chapter";
+    }
+
     if (!formData.fullName.trim()) {
         validationErrors.fullName =
           "Full Name is required";
@@ -513,31 +518,35 @@ useEffect(() => {
           </div>
         )} */}
 
-        {/* Chapter Name */}
+        {/* Chapter Name — required for all registration types */}
 
-        {registrationType !== "GUEST" && (
-            <div className="md:col-span-2">
-              <select
-                name="chapterId"
-                value={formData.chapterId}
-                onChange={handleChapterChange}
-                className="input"
+        <div className="md:col-span-2">
+          <select
+            name="chapterId"
+            value={formData.chapterId}
+            onChange={handleChapterChange}
+            className={`input ${errors.chapterId ? "border-red-500" : ""}`}
+          >
+            <option value="">
+              Select Chapter *
+            </option>
+
+            {chapters.map((chapter) => (
+              <option
+                key={chapter.id}
+                value={chapter.id}
               >
-                <option value="">
-                  Select Chapter
-                </option>
+                {chapter.name} • {chapter.city}
+              </option>
+            ))}
+          </select>
 
-                {chapters.map((chapter) => (
-                  <option
-                    key={chapter.id}
-                    value={chapter.id}
-                  >
-                    {chapter.name} • {chapter.city}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {errors.chapterId && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.chapterId}
+            </p>
           )}
+        </div>
 
         {/* Personal Details */}
 
