@@ -614,9 +614,10 @@ useEffect(() => {
           )}
         </div>
 
-        {/* Personal Details */}
+        {/* Personal Details — for MEMBER, phone/email come first so
+        Fetch Details can auto-fill the name right after */}
 
-        <div>
+        <div className={registrationType === "MEMBER" ? "order-3" : ""}>
             <input
                   type="text"
                   name="fullName"
@@ -637,7 +638,7 @@ useEffect(() => {
                 )}
               </div>
 
-      <div>
+      <div className={registrationType === "MEMBER" ? "order-1" : ""}>
           <div className="flex">
             <div className="px-4 flex items-center border border-r-0 border-zinc-200 dark:border-zinc-700 rounded-l-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400">
               +91
@@ -663,7 +664,7 @@ useEffect(() => {
           )}
         </div>
 
-        <div>
+        <div className={registrationType === "MEMBER" ? "order-2" : ""}>
             <input
               type="email"
               name="email"
@@ -708,10 +709,9 @@ useEffect(() => {
                 rounded-xl
                 bg-zinc-200 dark:bg-zinc-800
                 hover:bg-zinc-300 dark:hover:bg-zinc-700
-                text-zinc-850 dark:text-white
+                text-zinc-900 dark:text-white
                 disabled:opacity-60
                 disabled:cursor-not-allowed
-                text-white
                 text-sm
                 font-medium
                 transition
@@ -722,9 +722,16 @@ useEffect(() => {
             </button>
 
             <div className="min-w-0">
-              <p className="text-zinc-400 text-xs leading-relaxed">
+              <p className="text-zinc-600 dark:text-zinc-400 text-xs leading-relaxed">
                 Already a member? Enter your phone number and email above, then click
-                Fetch Details to auto-fill the rest of the form.
+                Fetch Details to auto-fill the rest of the form — or{" "}
+                <Link
+                  to="/login"
+                  className="text-emerald-600 dark:text-emerald-400 font-medium hover:underline"
+                >
+                  log in
+                </Link>{" "}
+                to your portal instead of registering again.
               </p>
               {memberFetchMsg && (
                 <p
@@ -764,6 +771,30 @@ useEffect(() => {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Already-registered nudge — VISITOR + chapter selected */}
+        {registrationType === "VISITOR" && formData.chapterId && (
+          <div
+            className="
+              md:col-span-2
+              border border-zinc-200 dark:border-zinc-800
+              rounded-xl
+              p-4
+              bg-zinc-100/50 dark:bg-zinc-950/50
+            "
+          >
+            <p className="text-zinc-600 dark:text-zinc-400 text-xs leading-relaxed">
+              Already registered as a visitor or member before?{" "}
+              <Link
+                to="/login"
+                className="text-emerald-600 dark:text-emerald-400 font-medium hover:underline"
+              >
+                Log in
+              </Link>{" "}
+              to your portal instead of filling this form again.
+            </p>
           </div>
         )}
 
@@ -827,7 +858,7 @@ useEffect(() => {
 
        <div className="md:col-span-2">
 
-          <label className="text-white block mb-3">
+          <label className="text-zinc-900 dark:text-white block mb-3">
             Social Profiles
           </label>
 
@@ -960,34 +991,34 @@ useEffect(() => {
 
         {selectedMeeting && (
           
-          <div className="md:col-span-2 border border-green-700 rounded-xl p-5 bg-green-50">
-            <h3 className="text-green-700 font-semibold">
+          <div className="md:col-span-2 border border-green-700 dark:border-green-800 rounded-xl p-5 bg-green-50 dark:bg-green-950/20">
+            <h3 className="text-green-700 dark:text-green-400 font-semibold">
               Upcoming Meeting
             </h3>
-            <h4 className="text-slate-900 text-lg mt-2 font-medium">
+            <h4 className="text-slate-900 dark:text-white text-lg mt-2 font-medium">
               {selectedMeeting.title}
             </h4>
             {selectedMeeting.description && (
-              <p className="text-slate-600 mt-1 text-sm italic">
+              <p className="text-slate-600 dark:text-zinc-400 mt-1 text-sm italic">
                 {selectedMeeting.description}
               </p>
             )}
-            <p className="text-slate-700 mt-2">📍 {selectedMeeting.address}</p>
-            <p className="text-slate-700">
+            <p className="text-slate-700 dark:text-zinc-300 mt-2">📍 {selectedMeeting.address}</p>
+            <p className="text-slate-700 dark:text-zinc-300">
               📅 {new Date(selectedMeeting.meetingDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
             </p>
-            <p className="text-slate-700">
+            <p className="text-slate-700 dark:text-zinc-300">
               🕒 {selectedMeeting.startTime} - {selectedMeeting.endTime}
             </p>
-            <p className="text-green-700 mt-2 font-medium">
+            <p className="text-green-700 dark:text-green-400 mt-2 font-medium">
               Registration Fee: ₹{selectedMeeting.meetingFee ? Number(selectedMeeting.meetingFee) : 1000}
             </p>
             {selectedMeeting.agenda && (
-              <div className="mt-3 pt-3 border-t border-green-200">
-                <span className="text-green-800 text-xs font-semibold uppercase tracking-wider block">
+              <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-900">
+                <span className="text-green-800 dark:text-green-400 text-xs font-semibold uppercase tracking-wider block">
                   Agenda:
                 </span>
-                <p className="text-slate-700 text-sm mt-1 whitespace-pre-line">
+                <p className="text-slate-700 dark:text-zinc-300 text-sm mt-1 whitespace-pre-line">
                   {selectedMeeting.agenda}
                 </p>
               </div>
