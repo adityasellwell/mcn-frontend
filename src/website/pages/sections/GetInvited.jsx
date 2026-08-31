@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 import Container from "../../components/ui/Container";
 import Button from "../../components/ui/Button";
 
 const GetInvitedSection = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -23,12 +26,14 @@ const GetInvitedSection = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    console.log("Visitor Lead:", formData);
-
-    alert(
-      "Thank you! Your invitation request has been submitted."
-    );
+    const queryParams = new URLSearchParams({
+      type: "VISITOR",
+      fullName: `${formData.firstName} ${formData.lastName}`.trim(),
+      email: formData.email,
+      mobile: formData.phone,
+      companyName: formData.businessName,
+    });
+    navigate(`/register?${queryParams.toString()}`);
   };
 
   return (
@@ -36,10 +41,16 @@ const GetInvitedSection = () => {
       id="get-invited"
       className="
         py-16
+        bg-white
+        dark:bg-zinc-950
       "
     >
       <Container>
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
           className="
             max-w-5xl
             mx-auto
@@ -47,9 +58,11 @@ const GetInvitedSection = () => {
             rounded-3xl
 
             border
-            border-zinc-800
+            border-zinc-200
+            dark:border-zinc-800
 
-            bg-zinc-900
+            bg-zinc-50
+            dark:bg-zinc-900
 
             p-8
             lg:p-10
@@ -64,6 +77,8 @@ const GetInvitedSection = () => {
                 lg:text-4xl
 
                 font-bold
+                text-zinc-900
+                dark:text-white
               "
             >
               Attend A Meeting Before Joining
@@ -73,7 +88,8 @@ const GetInvitedSection = () => {
               className="
                 mt-4
 
-                text-zinc-400
+                text-zinc-600
+                dark:text-zinc-400
 
                 max-w-2xl
                 mx-auto
@@ -113,12 +129,19 @@ const GetInvitedSection = () => {
                 rounded-xl
 
                 border
-                border-zinc-700
+                border-zinc-200
+                dark:border-zinc-700
 
-                bg-zinc-950
+                bg-white
+                dark:bg-zinc-950
+                text-zinc-900
+                dark:text-white
+                placeholder-zinc-400
+                dark:placeholder-zinc-600
 
                 focus:outline-none
                 focus:border-[#0C831F]
+                transition-colors
               "
             />
 
@@ -136,12 +159,19 @@ const GetInvitedSection = () => {
                 rounded-xl
 
                 border
-                border-zinc-700
+                border-zinc-200
+                dark:border-zinc-700
 
-                bg-zinc-950
+                bg-white
+                dark:bg-zinc-950
+                text-zinc-900
+                dark:text-white
+                placeholder-zinc-400
+                dark:placeholder-zinc-600
 
                 focus:outline-none
                 focus:border-[#0C831F]
+                transition-colors
               "
             />
 
@@ -159,12 +189,19 @@ const GetInvitedSection = () => {
                 rounded-xl
 
                 border
-                border-zinc-700
+                border-zinc-200
+                dark:border-zinc-700
 
-                bg-zinc-950
+                bg-white
+                dark:bg-zinc-950
+                text-zinc-900
+                dark:text-white
+                placeholder-zinc-400
+                dark:placeholder-zinc-600
 
                 focus:outline-none
                 focus:border-[#0C831F]
+                transition-colors
               "
             />
 
@@ -182,12 +219,19 @@ const GetInvitedSection = () => {
                 rounded-xl
 
                 border
-                border-zinc-700
+                border-zinc-200
+                dark:border-zinc-700
 
-                bg-zinc-950
+                bg-white
+                dark:bg-zinc-950
+                text-zinc-900
+                dark:text-white
+                placeholder-zinc-400
+                dark:placeholder-zinc-600
 
                 focus:outline-none
                 focus:border-[#0C831F]
+                transition-colors
               "
             />
 
@@ -207,12 +251,19 @@ const GetInvitedSection = () => {
                 rounded-xl
 
                 border
-                border-zinc-700
+                border-zinc-200
+                dark:border-zinc-700
 
-                bg-zinc-950
+                bg-white
+                dark:bg-zinc-950
+                text-zinc-900
+                dark:text-white
+                placeholder-zinc-400
+                dark:placeholder-zinc-600
 
                 focus:outline-none
                 focus:border-[#0C831F]
+                transition-colors
               "
             />
 
@@ -230,12 +281,19 @@ const GetInvitedSection = () => {
                 rounded-xl
 
                 border
-                border-zinc-700
+                border-zinc-200
+                dark:border-zinc-700
 
-                bg-zinc-950
+                bg-white
+                dark:bg-zinc-950
+                text-zinc-900
+                dark:text-white
+                placeholder-zinc-400
+                dark:placeholder-zinc-600
 
                 focus:outline-none
                 focus:border-[#0C831F]
+                transition-colors
               "
             />
 
@@ -253,12 +311,19 @@ const GetInvitedSection = () => {
                 rounded-xl
 
                 border
-                border-zinc-700
+                border-zinc-200
+                dark:border-zinc-700
 
-                bg-zinc-950
+                bg-white
+                dark:bg-zinc-950
+                text-zinc-900
+                dark:text-white
+                placeholder-zinc-400
+                dark:placeholder-zinc-600
 
                 focus:outline-none
                 focus:border-[#0C831F]
+                transition-colors
               "
             />
 
@@ -274,7 +339,7 @@ const GetInvitedSection = () => {
               </Button>
             </div>
           </form>
-        </div>
+        </motion.div>
       </Container>
     </section>
   );

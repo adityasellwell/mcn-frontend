@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import usePageTitle from "../../hooks/usePageTitle";
 import { createApplication } from "../../services/applicationService";
 import toast from "react-hot-toast";
@@ -7,10 +8,13 @@ import qrImage from "../../assets/images/qr.png";
 import { getChapters } from "../../services/chapterService";
 import { getUpcomingMeeting, getUpcomingMeetings } from "../../services/meetingService";
 import { lookupMember } from "../../services/memberService";
-import { Trash, Search } from "lucide-react";
+import { usePortalAuth } from "../../context/PortalAuthContext";
+import { Trash, Search, LogIn } from "lucide-react";
 
 const Register = () => {
   usePageTitle("Register Yourself - MCN");
+  const { portalUser } = usePortalAuth();
+  const [searchParams] = useSearchParams();
   const fileInputRef = useRef(null);
   const isSubmittingRef = useRef(false);
   const [loading, setLoading] = useState(false);
@@ -393,19 +397,42 @@ useEffect(() => {
 
   loadChapters();
   loadUpcoming();
-}, []);
+
+  const typeParam = searchParams.get("type");
+  if (typeParam) {
+    setRegistrationType(typeParam);
+  }
+
+  const fullNameParam = searchParams.get("fullName");
+  const emailParam = searchParams.get("email");
+  const mobileParam = searchParams.get("mobile");
+  const companyNameParam = searchParams.get("companyName");
+
+  setFormData((prev) => ({
+    ...prev,
+    fullName: prev.fullName || fullNameParam || (portalUser?.name || ""),
+    email: prev.email || emailParam || (portalUser?.email || ""),
+    mobile: prev.mobile || mobileParam || (portalUser?.phone || ""),
+    companyName: prev.companyName || companyNameParam || "",
+  }));
+}, [searchParams, portalUser]);
 
   return (
  
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       className="
         w-full
         max-w-4xl
         p-8
         rounded-3xl
         border
-        border-zinc-800
-        bg-zinc-900
+        border-zinc-200
+        dark:border-zinc-800
+        bg-zinc-50
+        dark:bg-zinc-900
       "
     >
       <h1
@@ -413,7 +440,8 @@ useEffect(() => {
           text-3xl
           font-bold
           text-center
-          text-white
+          text-zinc-900
+          dark:text-white
         "
       >
         Register Yourself
@@ -423,11 +451,49 @@ useEffect(() => {
         className="
           mt-3
           text-center
-          text-white
+          text-zinc-600
+          dark:text-zinc-400
         "
       >
         Complete your registration and submit your details.
       </p>
+
+      {portalUser && (
+        <div
+          className="
+            mt-6
+            flex flex-col sm:flex-row sm:items-center sm:justify-between
+            gap-3
+            border border-emerald-700
+            rounded-xl
+            p-4
+            bg-emerald-950/20
+          "
+        >
+          <p className="text-emerald-400 text-sm">
+            You're already logged in as <strong>{portalUser.name}</strong>. No need to fill this
+            form again — head to your portal instead.
+          </p>
+          <Link
+            to="/portal/dashboard"
+            className="
+              shrink-0
+              flex items-center justify-center gap-2
+              px-4 py-2.5
+              rounded-xl
+              bg-emerald-600
+              hover:bg-emerald-700
+              text-white
+              text-sm
+              font-medium
+              transition
+            "
+          >
+            <LogIn size={15} />
+            Go to My Portal
+          </Link>
+        </div>
+      )}
 
       <form
         onSubmit={handleSubmit}
@@ -573,7 +639,7 @@ useEffect(() => {
 
       <div>
           <div className="flex">
-            <div className="px-4 flex items-center border border-r-0 border-zinc-700 rounded-l-xl bg-zinc-900 text-zinc-400">
+            <div className="px-4 flex items-center border border-r-0 border-zinc-200 dark:border-zinc-700 rounded-l-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400">
               +91
             </div>
 
@@ -625,10 +691,10 @@ useEffect(() => {
               md:col-span-2
               flex flex-col sm:flex-row sm:items-center
               gap-3 sm:gap-4
-              border border-zinc-800
+              border border-zinc-200 dark:border-zinc-800
               rounded-xl
               p-4
-              bg-zinc-950/50
+              bg-zinc-100/50 dark:bg-zinc-950/50
             "
           >
             <button
@@ -640,8 +706,9 @@ useEffect(() => {
                 flex items-center justify-center gap-2
                 px-4 py-2.5
                 rounded-xl
-                bg-zinc-800
-                hover:bg-zinc-700
+                bg-zinc-200 dark:bg-zinc-800
+                hover:bg-zinc-300 dark:hover:bg-zinc-700
+                text-zinc-850 dark:text-white
                 disabled:opacity-60
                 disabled:cursor-not-allowed
                 text-white
@@ -671,6 +738,30 @@ useEffect(() => {
                 >
                   {memberFetchMsg}
                 </p>
+              )}
+
+              {memberFetchStatus === "found" && (
+                <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                  <p className="text-xs text-zinc-400">
+                    You're already a member — you don't have to fill this form again unless
+                    you're registering for a new meeting.
+                  </p>
+                  <Link
+                    to="/login"
+                    className="
+                      shrink-0
+                      inline-flex items-center gap-1.5
+                      text-xs font-medium
+                      text-emerald-400
+                      hover:text-emerald-300
+                      hover:underline
+                      transition
+                    "
+                  >
+                    <LogIn size={12} />
+                    Login instead
+                  </Link>
+                </div>
               )}
             </div>
           </div>
@@ -974,14 +1065,16 @@ useEffect(() => {
             className="
               md:col-span-2
               border
-              border-zinc-800
+              border-zinc-200
+              dark:border-zinc-800
               rounded-2xl
               p-5
-              bg-zinc-950
+              bg-zinc-100/50
+              dark:bg-zinc-950
               text-center
             "
           >
-            <h3 className="text-white font-semibold text-lg">
+            <h3 className="text-zinc-900 dark:text-white font-semibold text-lg">
               Registration Fee
             </h3>
 
@@ -989,7 +1082,7 @@ useEffect(() => {
               ₹{selectedMeeting?.meetingFee ? Number(selectedMeeting.meetingFee) : 1000}
             </p>
 
-            <p className="text-zinc-400 text-sm mt-2">
+            <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-2">
               Scan the QR code and complete your payment.
             </p>
 
@@ -1015,11 +1108,11 @@ useEffect(() => {
 
 
         <div className="md:col-span-2">
-          <h4 className="text-white font-medium mb-3">
+          <h4 className="text-zinc-900 dark:text-white font-medium mb-3">
             Payment Proof
           </h4>
 
-          <p className="text-zinc-400 text-sm mb-4">
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4">
             Upload Screenshot or Enter UTR Number (either one is required)
           </p>
         </div>
@@ -1032,7 +1125,8 @@ useEffect(() => {
             accept="image/*"
             className="
               input
-              text-white
+              text-zinc-700
+              dark:text-white
               file:mr-4
               file:py-2
               file:px-4
@@ -1111,7 +1205,7 @@ useEffect(() => {
           </Link>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 };
 

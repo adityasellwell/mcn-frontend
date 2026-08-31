@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 
 import Container from "../components/ui/Container";
 import Button from "../components/ui/Button";
+import ThemeToggle from "../components/common/ThemeToggle";
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -40,9 +41,11 @@ const Header = () => {
         z-50
 
         border-b
-        border-zinc-800
+        border-zinc-200
+        dark:border-zinc-800
 
-        bg-zinc-950/80
+        bg-white/80
+        dark:bg-zinc-950/80
 
         backdrop-blur-md
       "
@@ -94,7 +97,8 @@ const Header = () => {
                 className="
                   text-lg
                   font-bold
-                  text-white
+                  text-zinc-900
+                  dark:text-white
                   whitespace-nowrap
                 "
               >
@@ -107,7 +111,8 @@ const Header = () => {
                   sm:block
 
                   text-xs
-                  text-zinc-400
+                  text-zinc-500
+                  dark:text-zinc-400
                   whitespace-nowrap
                 "
               >
@@ -134,7 +139,8 @@ const Header = () => {
                 className="
                   relative
 
-                  text-zinc-400
+                  text-zinc-600
+                  dark:text-zinc-400
 
                   hover:text-[#22C55E]
 
@@ -172,6 +178,8 @@ const Header = () => {
               gap-3
             "
           >
+            <ThemeToggle />
+
             <Link to="/login">
               <Button variant="secondary">
                 Login
@@ -194,7 +202,7 @@ const Header = () => {
           {/* Mobile Toggle */}
 
           <button
-            className="md:hidden"
+            className="md:hidden text-zinc-700 dark:text-zinc-300 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
             onClick={() =>
               setMobileOpen(!mobileOpen)
             }
@@ -213,7 +221,8 @@ const Header = () => {
               py-5
 
               border-t
-              border-zinc-800
+              border-zinc-200
+              dark:border-zinc-800
             "
           >
             <div className="flex flex-col gap-4">
@@ -222,7 +231,8 @@ const Header = () => {
                   key={link.label}
                   href={link.href}
                   className="
-                    text-zinc-300
+                    text-zinc-700
+                    dark:text-zinc-300
 
                     hover:text-[#22C55E]
                   "
@@ -243,6 +253,11 @@ const Header = () => {
                   gap-3
                 "
               >
+                <div className="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
+                  <span className="text-sm text-zinc-500 dark:text-zinc-400">Theme</span>
+                  <ThemeToggle />
+                </div>
+
                 <Link
                   to="/login"
                   onClick={() =>

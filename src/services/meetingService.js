@@ -15,3 +15,13 @@ export const getUpcomingMeetings = async () => {
 
   return response.data;
 };
+
+export const getWebsiteMeetings = async () => {
+  const response = await api.get("/meeting/website");
+  return response.data;
+};
+
+export const getWebsiteMeetingDetail = async (id) => {
+  const response = await api.get(`/meeting/website/${id}`);
+  return response.data;
+};

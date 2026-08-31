@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import usePageTitle from "../../hooks/usePageTitle";
-import { Plus, Eye, Pencil, Trash2, X, UserCheck, ArrowRightLeft } from "lucide-react";
+import { Plus, Eye, Pencil, Trash2, X, UserCheck, ArrowRightLeft, LogIn } from "lucide-react";
 import {
   fetchVisitors,
   fetchVisitorById,
@@ -11,6 +11,7 @@ import {
 } from "../services/visitorService";
 import { fetchChapters } from "../services/chapterService";
 import { fetchMembers } from "../services/memberService";
+import { openPortalAsUser } from "../services/portalImpersonationService";
 import ConfirmModal from "../components/ConfirmModal";
 import toast from "react-hot-toast";
 
@@ -135,7 +136,7 @@ const ConvertModal = ({ visitor, chapters, onClose, onConverted }) => {
 // ─────────────────────────────────────────────
 // View Visitor Modal
 // ─────────────────────────────────────────────
-const ViewModal = ({ visitor, chapters, onClose, onConvert, onDelete }) => {
+const ViewModal = ({ visitor, chapters, onClose, onConvert, onDelete, onImpersonate }) => {
   if (!visitor) return null;
 
   return (
@@ -215,6 +216,13 @@ const ViewModal = ({ visitor, chapters, onClose, onConvert, onDelete }) => {
         {/* Footer */}
         {visitor.status !== "CONVERTED" && (
           <div className="flex items-center gap-3 p-6 border-t border-white/5">
+            <button
+              onClick={() => onImpersonate(visitor)}
+              className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 text-sm font-medium transition"
+              title="Login as this visitor"
+            >
+              <LogIn size={16} />
+            </button>
             <button
               onClick={() => onConvert(visitor)}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-sm font-medium transition"
@@ -530,6 +538,15 @@ const Visitors = () => {
     }
   };
 
+  // ─── Admin: log directly into this visitor's portal session ───
+  const handleImpersonate = async (visitor) => {
+    try {
+      await openPortalAsUser("visitor", visitor.id);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to open visitor portal");
+    }
+  };
+
   // ─── Open convert modal ───
   const handleConvert = (visitor) => {
     setViewTarget(null);
@@ -635,6 +652,16 @@ const Visitors = () => {
                           >
                             <Pencil size={15} />
                           </button>
+                          {/* Login as */}
+                          {visitor.status !== "CONVERTED" && (
+                            <button
+                              onClick={() => handleImpersonate(visitor)}
+                              className="p-1.5 rounded-lg text-[#6b7ea3] hover:text-blue-400 hover:bg-blue-500/10 transition"
+                              title="Login as this visitor"
+                            >
+                              <LogIn size={15} />
+                            </button>
+                          )}
                           {/* Convert */}
                           {visitor.status !== "CONVERTED" && (
                             <button
@@ -664,6 +691,7 @@ const Visitors = () => {
           onClose={() => setViewTarget(null)}
           onConvert={handleConvert}
           onDelete={setDeleteTarget}
+          onImpersonate={handleImpersonate}
         />
       )}
 

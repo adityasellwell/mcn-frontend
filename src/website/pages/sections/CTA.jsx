@@ -1,10 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-
 import Container from "../../components/ui/Container";
-
 import Button from "../../components/ui/Button";
-
 import { landingData } from "../../data/landingData";
 
 /**
@@ -26,6 +23,8 @@ const CTA = () => {
       className="
         py-12
         lg:py-16
+        bg-white
+        dark:bg-zinc-950
       "
     >
       <Container>
@@ -35,15 +34,15 @@ const CTA = () => {
           viewport={{ once: true }}
           className="
             relative
-
             overflow-hidden
-
             rounded-[32px]
 
             border
-            border-zinc-800
+            border-zinc-200
+            dark:border-zinc-800
 
-            bg-zinc-900
+            bg-zinc-50
+            dark:bg-zinc-900
 
             px-8
             py-16
@@ -70,6 +69,7 @@ const CTA = () => {
               rounded-full
 
               bg-[#0C831F]/20
+              dark:bg-[#0C831F]/20
 
               blur-[120px]
             "
@@ -80,9 +80,10 @@ const CTA = () => {
               className="
                 text-4xl
                 lg:text-6xl
-
                 font-bold
                 tracking-tight
+                text-zinc-900
+                dark:text-white
               "
             >
               {cta.title}
@@ -91,11 +92,10 @@ const CTA = () => {
             <p
               className="
                 mt-6
-
                 max-w-2xl
                 mx-auto
-
-                text-zinc-400
+                text-zinc-600
+                dark:text-zinc-400
                 text-lg
                 leading-relaxed
               "
@@ -106,13 +106,10 @@ const CTA = () => {
             <div
               className="
                 mt-10
-
                 flex
                 flex-col
                 sm:flex-row
-
                 justify-center
-
                 gap-4
               "
             > 

@@ -11,7 +11,7 @@ import Footer from "./Footer";
  */
 const Layout = ({ children, centerContent = false }) => {
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white flex flex-col">
       <Header />
 
       <main

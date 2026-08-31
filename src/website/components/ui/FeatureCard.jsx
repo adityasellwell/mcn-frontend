@@ -4,6 +4,7 @@ import {
   CalendarDays,
   TrendingUp,
 } from "lucide-react";
+import { motion } from "framer-motion";
 
 const iconMap = {
   users: Users,
@@ -20,23 +21,28 @@ const FeatureCard = ({
   const Icon = iconMap[icon];
 
   return (
-    <div
+    <motion.div
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
       className="
         p-8
         rounded-3xl
 
         border
-        border-zinc-800
+        border-zinc-200
+        dark:border-zinc-800
 
-        bg-zinc-900
+        bg-zinc-50
+        dark:bg-zinc-900
 
         transition-all
         duration-300
 
         hover:border-[#0C831F]
-        hover:-translate-y-1
+        dark:hover:border-[#0C831F]
         hover:shadow-xl
-        hover:shadow-black/20 s
+        hover:shadow-black/5
+        dark:hover:shadow-black/20
       "
     >
       <div
@@ -46,7 +52,9 @@ const FeatureCard = ({
 
           rounded-xl
 
-          bg-zinc-800
+          bg-zinc-200
+          dark:bg-zinc-800
+          text-[#0C831F]
 
           flex
           items-center
@@ -63,6 +71,8 @@ const FeatureCard = ({
           text-2xl
           font-semibold
           mb-4
+          text-zinc-900
+          dark:text-white
         "
       >
         {title}
@@ -70,13 +80,14 @@ const FeatureCard = ({
 
       <p
         className="
-          text-zinc-400
+          text-zinc-600
+          dark:text-zinc-400
           leading-relaxed
         "
       >
         {description}
       </p>
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,15 +1,16 @@
 import Container from "../components/ui/Container";
 
 const Footer = () => {
-
   return (
     <footer
       id="footer"
       className="
         border-t
-        border-zinc-800
+        border-zinc-200
+        dark:border-zinc-800
 
-        bg-zinc-950
+        bg-zinc-50
+        dark:bg-zinc-950
       "
     >
       <Container>
@@ -60,7 +61,8 @@ const Footer = () => {
                   className="
                     text-xl
                     font-bold
-                    text-white
+                    text-zinc-900
+                    dark:text-white
                   "
                 >
                   MCN
@@ -69,7 +71,8 @@ const Footer = () => {
                 <p
                   className="
                     text-xs
-                    text-zinc-400
+                    text-zinc-600
+                    dark:text-zinc-400
                   "
                 >
                   Muslim Community Network
@@ -82,6 +85,7 @@ const Footer = () => {
                 mt-5
 
                 text-zinc-500
+                dark:text-zinc-500
                 leading-relaxed
                 max-w-sm
               "
@@ -99,7 +103,8 @@ const Footer = () => {
             <h4
               className="
                 font-semibold
-                text-white
+                text-zinc-900
+                dark:text-white
                 mb-5
               "
             >
@@ -115,7 +120,8 @@ const Footer = () => {
                 <a
                   href="/#about"
                   className="
-                    text-zinc-500
+                    text-zinc-600
+                    dark:text-zinc-500
                     hover:text-[#22C55E]
                     transition-colors
                   "
@@ -128,7 +134,8 @@ const Footer = () => {
                 <a
                   href="/#chapter"
                   className="
-                    text-zinc-500
+                    text-zinc-600
+                    dark:text-zinc-500
                     hover:text-[#22C55E]
                     transition-colors
                   "
@@ -141,7 +148,8 @@ const Footer = () => {
                 <a
                   href="/#meetings"
                   className="
-                    text-zinc-500
+                    text-zinc-600
+                    dark:text-zinc-500
                     hover:text-[#22C55E]
                     transition-colors
                   "
@@ -154,7 +162,8 @@ const Footer = () => {
                 <a
                   href="/#contact"
                   className="
-                    text-zinc-500
+                    text-zinc-600
+                    dark:text-zinc-500
                     hover:text-[#22C55E]
                     transition-colors
                   "
@@ -171,7 +180,8 @@ const Footer = () => {
             <h4
               className="
                 font-semibold
-                text-white
+                text-zinc-900
+                dark:text-white
                 mb-5
               "
             >
@@ -181,7 +191,8 @@ const Footer = () => {
             <div
               className="
                 space-y-3
-                text-zinc-500
+                text-zinc-600
+                dark:text-zinc-500
               "
             >
               <p>
@@ -204,7 +215,8 @@ const Footer = () => {
         <div
           className="
             border-t
-            border-zinc-800
+            border-zinc-200
+            dark:border-zinc-800
 
             py-5
 
@@ -221,7 +233,8 @@ const Footer = () => {
           <p
             className="
               text-sm
-              text-zinc-600
+              text-zinc-500
+              dark:text-zinc-600
             "
           >
             © 2026 MCN — Muslim Community Network. All Rights Reserved.
@@ -230,7 +243,8 @@ const Footer = () => {
           <p
             className="
               text-sm
-              text-zinc-600
+              text-zinc-500
+              dark:text-zinc-600
             "
           >
             Built &amp; maintained by{" "}

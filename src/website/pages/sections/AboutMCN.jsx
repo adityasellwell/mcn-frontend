@@ -1,8 +1,6 @@
 import { motion } from "framer-motion";
-
 import Container from "../../components/ui/Container";
 import FeatureCard from "../../components/ui/FeatureCard";
-
 import { landingData } from "../../data/landingData";
 
 const AboutMCN = () => {
@@ -14,6 +12,8 @@ const AboutMCN = () => {
       className="
         py-12
         lg:py-16
+        bg-white
+        dark:bg-zinc-950
       "
     >
       <Container>
@@ -46,6 +46,8 @@ const AboutMCN = () => {
               lg:text-6xl
               font-bold
               tracking-tight
+              text-zinc-900
+              dark:text-white
             "
           >
             Built For Business Growth
@@ -56,7 +58,8 @@ const AboutMCN = () => {
               mt-8
               text-lg
               leading-relaxed
-              text-zinc-400
+              text-zinc-600
+              dark:text-zinc-400
             "
           >
             {about.subtitle}

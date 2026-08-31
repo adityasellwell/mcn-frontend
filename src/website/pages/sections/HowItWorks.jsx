@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
-
 import Container from "../../components/ui/Container";
 import StepCard from "../../components/ui/StepCard";
-
 import { landingData } from "../../data/landingData";
+
 /**
  * ==================================================
  * How It Works Section
@@ -18,6 +17,8 @@ const HowItWorks = () => {
       className="
         py-12
         lg:py-16
+        bg-white
+        dark:bg-zinc-950
       "
     >
       <Container>
@@ -39,6 +40,7 @@ const HowItWorks = () => {
               uppercase
               tracking-[0.3em]
               text-zinc-500
+              dark:text-zinc-500
               font-medium
             "
           >
@@ -52,6 +54,8 @@ const HowItWorks = () => {
               lg:text-6xl
               font-bold
               tracking-tight
+              text-zinc-900
+              dark:text-white
             "
           >
             {howItWorks.title}
@@ -61,7 +65,8 @@ const HowItWorks = () => {
             className="
               mt-6
               text-lg
-              text-zinc-400
+              text-zinc-600
+              dark:text-zinc-400
               leading-relaxed
             "
           >

@@ -29,12 +29,16 @@ html {
   px-4
   py-3
   rounded-xl
- bg-zinc-950
+  bg-white
+  dark:bg-zinc-950
   border
-  border-zinc-800
+  border-zinc-200
+  dark:border-zinc-800
   outline-none
-  text-white
-  placeholder:text-zinc-500;
+  text-zinc-900
+  dark:text-white
+  placeholder:text-zinc-400
+  dark:placeholder:text-zinc-500;
 }
 
 .input:focus {

@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 /**
  * Reusable Button Component
  *
@@ -17,18 +19,21 @@ const Button = ({
   type = "button",
   variant = "primary",
   className = "",
+  ...props
 }) => {
   const variants = {
     primary:
-      "bg-[#0C831F] hover:bg-[#0A6F1A] text-white transition-all sduration-300 hover:-translate-y-0.5",
+      "bg-[#0C831F] hover:bg-[#0A6F1A] text-white transition-all duration-300",
 
     secondary:
-      "border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition-all duration-300 hover:-translate-y-0.5",
+      "border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-300",
   };
 
   return (
-    <button
+    <motion.button
       type={type}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
       className={`
         px-5
         py-2.5
@@ -39,9 +44,10 @@ const Button = ({
         ${variants[variant]}
         ${className}
       `}
+      {...props}
     >
       {children}
-    </button>
+    </motion.button>
   );
 };
 

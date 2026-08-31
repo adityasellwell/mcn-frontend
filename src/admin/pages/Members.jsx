@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import usePageTitle from "../../hooks/usePageTitle";
-import { Plus, Pencil, Eye, UserX, X, Users, Trash2 } from "lucide-react";
+import { Plus, Pencil, Eye, UserX, X, Users, Trash2, LogIn } from "lucide-react";
 import {
   fetchMembers,
   fetchMemberById,
@@ -10,6 +10,7 @@ import {
   deleteMember,
 } from "../services/memberService";
 import { fetchChapters } from "../services/chapterService";
+import { openPortalAsUser } from "../services/portalImpersonationService";
 import ConfirmModal from "../components/ConfirmModal";
 import toast from "react-hot-toast";
 
@@ -42,7 +43,7 @@ const Field = ({ label, value }) => (
 // ─────────────────────────────────────────────
 // View Member Modal
 // ─────────────────────────────────────────────
-const ViewModal = ({ member, onClose, onStatusChange, onDelete }) => {
+const ViewModal = ({ member, onClose, onStatusChange, onDelete, onImpersonate }) => {
   if (!member) return null;
 
   const handleDeactivate = async () => {
@@ -162,6 +163,13 @@ const ViewModal = ({ member, onClose, onStatusChange, onDelete }) => {
 
         {/* Footer */}
         <div className="flex items-center gap-3 p-6 border-t border-white/5">
+          <button
+            onClick={() => onImpersonate(member)}
+            className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 text-sm font-medium transition"
+            title="Login as this member"
+          >
+            <LogIn size={16} />
+          </button>
           {member.status === "ACTIVE" ? (
             <button
               onClick={handleDeactivate}
@@ -515,6 +523,15 @@ const Members = () => {
     }
   };
 
+  // ─── Admin: log directly into this member's portal session ───
+  const handleImpersonate = async (member) => {
+    try {
+      await openPortalAsUser("member", member.id);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to open member portal");
+    }
+  };
+
   return (
     <>
       <div className="space-y-6">
@@ -600,6 +617,13 @@ const Members = () => {
                             <Pencil size={15} />
                           </button>
                           <button
+                            onClick={() => handleImpersonate(member)}
+                            className="p-1.5 rounded-lg text-[#6b7ea3] hover:text-blue-400 hover:bg-blue-500/10 transition"
+                            title="Login as this member"
+                          >
+                            <LogIn size={15} />
+                          </button>
+                          <button
                             onClick={() => setDeleteTarget(member)}
                             className="p-1.5 rounded-lg text-[#6b7ea3] hover:text-rose-400 hover:bg-rose-500/10 transition"
                             title="Delete Permanently"
@@ -624,6 +648,7 @@ const Members = () => {
           onClose={() => setViewTarget(null)}
           onStatusChange={handleStatusChange}
           onDelete={setDeleteTarget}
+          onImpersonate={handleImpersonate}
         />
       )}
 

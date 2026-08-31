@@ -1,9 +1,7 @@
 import { motion } from "framer-motion";
-//import CountUp from "react-countup";
 import Container from "../../components/ui/Container";
 import Button from "../../components/ui/Button";
 import { Link } from "react-router-dom";
-
 import { landingData } from "../../data/landingData";
 
 /**
@@ -31,6 +29,8 @@ const Hero = () => {
         pb-8
         lg:pt-10
         lg:pb-12
+        bg-white
+        dark:bg-zinc-950
       "
     >
       <Container>
@@ -63,17 +63,21 @@ const Hero = () => {
                 rounded-full
 
                 border
-                border-zinc-800
+                border-zinc-200
+                dark:border-zinc-800
 
-                bg-zinc-900/80
+                bg-zinc-100/80
+                dark:bg-zinc-900/80
                 backdrop-blur-md
 
                 shadow-lg
-                shadow-black/20
+                shadow-black/5
+                dark:shadow-black/20
 
                 text-sm
                 font-medium
-                text-zinc-300
+                text-zinc-700
+                dark:text-zinc-300
               "
             >
               <span
@@ -100,6 +104,8 @@ const Hero = () => {
                 font-bold
                 tracking-tight
                 leading-[1]
+                text-zinc-900
+                dark:text-white
               "
             >
               {hero.title}
@@ -117,7 +123,8 @@ const Hero = () => {
                 text-base
                 lg:text-lg
                 leading-relaxed
-                text-zinc-400
+                text-zinc-600
+                dark:text-zinc-400
               "
             >
               {hero.description}
@@ -126,126 +133,133 @@ const Hero = () => {
             {/* Buttons */}
 
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="
-                  mt-8
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="
+                mt-8
 
-                  flex
-                  flex-col
-                  sm:flex-row
+                flex
+                flex-col
+                sm:flex-row
 
-                  gap-4
-                "
+                gap-4
+              "
+            >
+              <Link
+                to="/register"
+                className="flex-1"
               >
-                <Link
-                  to="/register"
-                  className="flex-1"
-                >
-                  <Button className="w-full">
-                    Become A Member
-                  </Button>
-                </Link>
+                <Button className="w-full">
+                  Become A Member
+                </Button>
+              </Link>
 
-                <a
-                  href="#get-invited"
-                  className="flex-1"
+              <a
+                href="#get-invited"
+                className="flex-1"
+              >
+                <Button
+                  variant="secondary"
+                  className="w-full"
                 >
-                  <Button
-                    variant="secondary"
-                    className="w-full"
-                  >
-                    Get Invited
-                  </Button>
-                </a>
-              </motion.div>
+                  Get Invited
+                </Button>
+              </a>
+            </motion.div>
+
             {/* Animated Statistics */}
 
             <div
-            className="
+              className="
                 grid
                 grid-cols-3
                 gap-8
                 mt-16
-            "
+              "
             >
-            {hero.stats.map((item) => (
+              {hero.stats.map((item) => (
                 <div key={item.label}>
-                <h3
+                  <h3
                     className="
-                    text-2xl
-                    font-bold
+                      text-2xl
+                      font-bold
+                      text-zinc-900
+                      dark:text-white
                     "
-                >
+                  >
                     {item.value}
-                </h3>
+                  </h3>
 
-                <p
+                  <p
                     className="
-                    mt-1
-                    text-sm
-                    text-zinc-500
+                      mt-1
+                      text-sm
+                      text-zinc-500
+                      dark:text-zinc-500
                     "
-                >
+                  >
                     {item.label}
-                </p>
+                  </p>
                 </div>
-            ))}
+              ))}
             </div>
               
           </div>
 
-              {/* =====================================
-                  RIGHT VISUAL
-              ===================================== */}
+          {/* =====================================
+              RIGHT VISUAL
+          ===================================== */}
 
-              <div>
-                <div
-                  className="
-                    relative
-                    h-[400px]
-                    rounded-3xl
-                    overflow-hidden
+          <div>
+            <div
+              className="
+                relative
+                h-[400px]
+                rounded-3xl
+                overflow-hidden
 
-                    border
-                    border-zinc-800
+                border
+                border-zinc-200
+                dark:border-zinc-800
 
-                    bg-zinc-900
+                bg-zinc-100
+                dark:bg-zinc-900
 
-                    shadow-xl
-                    shadow-black/20
-                  "
-                >
-                  <img
-                    src={hero.image}
-                    alt="MCN Networking Community"
-                    className="
-                      h-full
-                      w-full
-                      object-cover
-                    "
-                  />
+                shadow-xl
+                shadow-black/5
+                dark:shadow-black/20
+              "
+            >
+              <img
+                src={hero.image}
+                alt="MCN Networking Community"
+                className="
+                  h-full
+                  w-full
+                  object-cover
+                "
+              />
 
-                  <div
-                    className="
-                      absolute
-                      inset-0
+              <div
+                className="
+                  absolute
+                  inset-0
 
-                      bg-gradient-to-t
-                      from-black/40
-                      via-black/10
-                      to-transparent
-                    "
-                  />
-                </div>
-              </div>
+                  bg-gradient-to-t
+                  from-black/40
+                  via-black/10
+                  to-transparent
+                "
+              />
+            </div>
+          </div>
 
-            </div> {/* <-- closes grid container */}
+        </div> {/* <-- closes grid container */}
 
-          </Container>
-        </section>
-      );
-    };
+      </Container>
+    </section>
+  );
+};
 
 export default Hero;

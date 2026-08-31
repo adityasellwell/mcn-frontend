@@ -19,6 +19,18 @@
     <meta property="twitter:url" content="https://mcnmumbai.com/" />
     <meta property="twitter:title" content="MCN Mumbai" />
     <meta property="twitter:description" content="Meet Connect Network (MCN) is a business networking community where professionals, entrepreneurs, and business owners build meaningful relationships, exchange referrals, and grow together." />
+    
+    <script>
+      (function() {
+        const stored = localStorage.getItem("mcn_theme");
+        const isDark = stored === "dark" || (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        if (isDark) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

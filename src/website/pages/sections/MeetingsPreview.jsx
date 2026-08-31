@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Loader2, CalendarOff } from "lucide-react";
 
 import Container from "../../components/ui/Container";
 import MeetingCard from "../../components/ui/MeetingCard";
 import Button from "../../components/ui/Button";
-import api from "../../../services/api";
+import { getWebsiteMeetings } from "../../../services/meetingService";
 
 const MeetingsPreview = () => {
   const [meetings, setMeetings] = useState([]);
@@ -14,8 +15,8 @@ const MeetingsPreview = () => {
   useEffect(() => {
     const loadMeetings = async () => {
       try {
-        const response = await api.get("/meeting/website");
-        setMeetings(response.data?.data || []);
+        const response = await getWebsiteMeetings();
+        setMeetings(response.data || response || []);
       } catch (err) {
         console.error("MeetingsPreview: failed to load meetings", err);
         setMeetings([]);
@@ -32,6 +33,8 @@ const MeetingsPreview = () => {
       className="
         py-12
         lg:py-16
+        bg-white
+        dark:bg-zinc-950
       "
     >
       <Container>
@@ -52,6 +55,7 @@ const MeetingsPreview = () => {
               uppercase
               tracking-[0.3em]
               text-zinc-500
+              dark:text-zinc-500
               font-medium
             "
           >
@@ -64,6 +68,8 @@ const MeetingsPreview = () => {
               text-4xl
               lg:text-6xl
               font-bold
+              text-zinc-900
+              dark:text-white
             "
           >
             Join The Next Networking Event
@@ -73,7 +79,8 @@ const MeetingsPreview = () => {
             className="
               mt-6
               text-lg
-              text-zinc-400
+              text-zinc-600
+              dark:text-zinc-400
               leading-relaxed
             "
           >
@@ -86,13 +93,13 @@ const MeetingsPreview = () => {
         <div className="mt-12">
           {loading ? (
             /* Loading Skeleton */
-            <div className="flex items-center justify-center py-16 gap-3 text-zinc-500">
+            <div className="flex items-center justify-center py-16 gap-3 text-zinc-500 dark:text-zinc-500">
               <Loader2 size={24} className="animate-spin" />
               <span>Loading meetings...</span>
             </div>
           ) : meetings.length === 0 ? (
             /* Empty State */
-            <div className="flex flex-col items-center justify-center py-16 gap-3 text-zinc-500">
+            <div className="flex flex-col items-center justify-center py-16 gap-3 text-zinc-500 dark:text-zinc-500">
               <CalendarOff size={36} />
               <p className="text-sm text-center">
                 No meetings available at the moment. Check back soon!
@@ -121,12 +128,12 @@ const MeetingsPreview = () => {
           )}
         </div>
 
-        {/* View All Meetings — scrolls to meetings section */}
+        {/* View All Meetings — links to meetings page */}
         {!loading && meetings.length > 1 && (
           <div className="mt-12 text-center">
-            <a href="/#meetings">
+            <Link to="/meetings">
               <Button variant="secondary">View All Meetings</Button>
-            </a>
+            </Link>
           </div>
         )}
       </Container>
