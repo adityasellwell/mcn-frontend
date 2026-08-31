@@ -614,31 +614,27 @@ useEffect(() => {
           )}
         </div>
 
-        {/* Personal Details — for MEMBER, phone/email come first so
-        Fetch Details can auto-fill the name right after */}
+        {/* Personal Details */}
+        {/* For MEMBER: Phone → Email → [Fetch Details] → Full Name */}
+        {/* For all others: Full Name → Phone → Email */}
 
-        <div className={registrationType === "MEMBER" ? "order-3" : ""}>
+        {registrationType !== "MEMBER" && (
+          <div>
             <input
-                  type="text"
-                  name="fullName"
-                  placeholder="Full Name *"
-                  className={`input ${
-                    errors.fullName
-                      ? "border-red-500"
-                      : ""
-                  }`}
-                  value={formData.fullName}
-                  onChange={handleChange}
-                />
+              type="text"
+              name="fullName"
+              placeholder="Full Name *"
+              className={`input ${errors.fullName ? "border-red-500" : ""}`}
+              value={formData.fullName}
+              onChange={handleChange}
+            />
+            {errors.fullName && (
+              <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+            )}
+          </div>
+        )}
 
-                {errors.fullName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.fullName}
-                  </p>
-                )}
-              </div>
-
-      <div className={registrationType === "MEMBER" ? "order-1" : ""}>
+        <div>
           <div className="flex">
             <div className="px-4 flex items-center border border-r-0 border-zinc-200 dark:border-zinc-700 rounded-l-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400">
               +91
@@ -664,7 +660,7 @@ useEffect(() => {
           )}
         </div>
 
-        <div className={registrationType === "MEMBER" ? "order-2" : ""}>
+        <div>
             <input
               type="email"
               name="email"
@@ -771,6 +767,23 @@ useEffect(() => {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Full Name — for MEMBER it appears AFTER fetch details so it can be auto-filled */}
+        {registrationType === "MEMBER" && (
+          <div className="md:col-span-2">
+            <input
+              type="text"
+              name="fullName"
+              placeholder="Full Name *"
+              className={`input ${errors.fullName ? "border-red-500" : ""}`}
+              value={formData.fullName}
+              onChange={handleChange}
+            />
+            {errors.fullName && (
+              <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+            )}
           </div>
         )}
 
