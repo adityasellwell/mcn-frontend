@@ -196,11 +196,21 @@ const Footer = () => {
               "
             >
               <p>
-                hello@mcn.com
+                <a
+                  href="mailto:support@mcnmumbai.com"
+                  className="hover:text-[#22C55E] transition-colors"
+                >
+                  support@mcnmumbai.com
+                </a>
               </p>
 
               <p>
-                +91 XXXXX XXXXX
+                <a
+                  href="tel:+918444040514"
+                  className="hover:text-[#22C55E] transition-colors"
+                >
+                  +91 84440 40514
+                </a>
               </p>
 
               <p>
