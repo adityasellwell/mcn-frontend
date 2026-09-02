@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import usePageTitle from "../../hooks/usePageTitle";
-import { ClipboardCheck, Search } from "lucide-react";
+import { ClipboardCheck, Search, UserPlus } from "lucide-react";
 import {
   fetchMeetingAttendance,
   markMemberAttendance,
   markVisitorAttendance,
+  addMemberToMeeting,
+  addVisitorToMeeting,
 } from "../services/attendanceService";
 import { fetchMeetings } from "../services/meetingService";
+import { fetchMembers } from "../services/memberService";
+import { fetchVisitors } from "../services/visitorService";
 import toast from "react-hot-toast";
 
 // ─────────────────────────────────────────────
@@ -41,6 +45,14 @@ const Attendance = () => {
   const [loading, setLoading] = useState(false);
   const [meetingsLoading, setMeetingsLoading] = useState(true);
 
+  // ─── Walk-in quick-add ───
+  const [allMembers, setAllMembers] = useState([]);
+  const [allVisitors, setAllVisitors] = useState([]);
+  const [addMemberId, setAddMemberId] = useState("");
+  const [addVisitorId, setAddVisitorId] = useState("");
+  const [addingMember, setAddingMember] = useState(false);
+  const [addingVisitor, setAddingVisitor] = useState(false);
+
   // ─── Load meetings for dropdown ───
   useEffect(() => {
     const load = async () => {
@@ -51,6 +63,20 @@ const Attendance = () => {
         toast.error("Failed to load meetings");
       } finally {
         setMeetingsLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  // ─── Load full member/visitor lists once, for the walk-in quick-add ───
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [memRes, visRes] = await Promise.all([fetchMembers(), fetchVisitors()]);
+        setAllMembers(memRes.data.data);
+        setAllVisitors(visRes.data.data);
+      } catch {
+        // non-critical — quick-add just won't have options if this fails
       }
     };
     load();
@@ -100,6 +126,46 @@ const Attendance = () => {
   const selectedMeeting = meetings.find(
     (m) => m.id === Number(selectedMeetingId)
   );
+
+  // ─── Walk-in quick-add: only offer people not already on this
+  // meeting's roster, and members from the meeting's own chapter ───
+  const rosterMemberIds = new Set(attendance.members.map((mm) => mm.member?.id));
+  const rosterVisitorIds = new Set(attendance.visitors.map((mv) => mv.visitor?.id));
+
+  const addableMembers = allMembers.filter(
+    (m) => !rosterMemberIds.has(m.id) && (!selectedMeeting || m.chapterId === selectedMeeting.chapterId)
+  );
+  const addableVisitors = allVisitors.filter((v) => !rosterVisitorIds.has(v.id));
+
+  const handleAddMember = async () => {
+    if (!addMemberId) return;
+    setAddingMember(true);
+    try {
+      await addMemberToMeeting(Number(selectedMeetingId), Number(addMemberId));
+      toast.success("Member added to this meeting");
+      setAddMemberId("");
+      loadAttendance(selectedMeetingId);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to add member");
+    } finally {
+      setAddingMember(false);
+    }
+  };
+
+  const handleAddVisitor = async () => {
+    if (!addVisitorId) return;
+    setAddingVisitor(true);
+    try {
+      await addVisitorToMeeting(Number(selectedMeetingId), Number(addVisitorId));
+      toast.success("Visitor added to this meeting");
+      setAddVisitorId("");
+      loadAttendance(selectedMeetingId);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to add visitor");
+    } finally {
+      setAddingVisitor(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -153,10 +219,34 @@ const Attendance = () => {
 
             {/* Members Table */}
             <div className="bg-[#162040] border border-white/5 rounded-xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-white/5">
+              <div className="px-5 py-4 border-b border-white/5 flex flex-wrap items-center justify-between gap-3">
                 <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
                   Members ({attendance.members.length})
                 </h3>
+
+                {/* Walk-in quick-add */}
+                <div className="flex items-center gap-2">
+                  <select
+                    value={addMemberId}
+                    onChange={(e) => setAddMemberId(e.target.value)}
+                    className="px-3 py-2 rounded-lg bg-[#0f1b3d] border border-white/10 text-xs text-white focus:outline-none focus:border-white/20 transition max-w-[220px]"
+                  >
+                    <option value="">Add a member not yet on this list…</option>
+                    {addableMembers.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.firstName} {m.lastName} — {m.memberCode}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleAddMember}
+                    disabled={!addMemberId || addingMember}
+                    className="p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    title="Add to this meeting"
+                  >
+                    <UserPlus size={15} />
+                  </button>
+                </div>
               </div>
 
               {attendance.members.length === 0 ? (
@@ -219,10 +309,34 @@ const Attendance = () => {
 
             {/* Visitors Table */}
             <div className="bg-[#162040] border border-white/5 rounded-xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-white/5">
+              <div className="px-5 py-4 border-b border-white/5 flex flex-wrap items-center justify-between gap-3">
                 <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
                   Visitors ({attendance.visitors.length})
                 </h3>
+
+                {/* Walk-in quick-add */}
+                <div className="flex items-center gap-2">
+                  <select
+                    value={addVisitorId}
+                    onChange={(e) => setAddVisitorId(e.target.value)}
+                    className="px-3 py-2 rounded-lg bg-[#0f1b3d] border border-white/10 text-xs text-white focus:outline-none focus:border-white/20 transition max-w-[220px]"
+                  >
+                    <option value="">Add a visitor not yet on this list…</option>
+                    {addableVisitors.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.firstName} {v.lastName || ""} — {v.phone}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleAddVisitor}
+                    disabled={!addVisitorId || addingVisitor}
+                    className="p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    title="Add to this meeting"
+                  >
+                    <UserPlus size={15} />
+                  </button>
+                </div>
               </div>
 
               {attendance.visitors.length === 0 ? (

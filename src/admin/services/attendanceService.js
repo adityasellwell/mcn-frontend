@@ -11,3 +11,11 @@ export const markMemberAttendance = (id, attendanceStatus) =>
 // ─── Mark visitor attendance ───
 export const markVisitorAttendance = (id, attendanceStatus) =>
   api.patch(`/attendance/visitor/${id}`, { attendanceStatus });
+
+// ─── Add a member/visitor to a meeting's roster (e.g. a walk-in at the
+// venue who wasn't already registered) ───
+export const addMemberToMeeting = (meetingId, memberId) =>
+  api.post("/meetingMember", { meetingId, memberId });
+
+export const addVisitorToMeeting = (meetingId, visitorId) =>
+  api.post("/meetingVisitor", { meetingId, visitorId });
