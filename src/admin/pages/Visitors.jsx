@@ -672,6 +672,14 @@ const Visitors = () => {
                               <ArrowRightLeft size={15} />
                             </button>
                           )}
+                          {/* Delete */}
+                          <button
+                            onClick={() => setDeleteTarget(visitor)}
+                            className="p-1.5 rounded-lg text-[#6b7ea3] hover:text-rose-400 hover:bg-rose-500/10 transition"
+                            title="Delete Permanently"
+                          >
+                            <Trash2 size={15} />
+                          </button>
                         </div>
                       </td>
                     </tr>
