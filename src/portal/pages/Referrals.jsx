@@ -156,7 +156,7 @@ const Referrals = () => {
           {ref.referralValue && (
             <div className="flex items-center gap-0.5 text-zinc-300 font-semibold">
               <IndianRupee size={12} className="text-[#0C831F]" />
-              <span>{ref.referralValue.toLocaleString("en-IN")}</span>
+              <span>{Number(ref.referralValue).toLocaleString("en-IN")}</span>
             </div>
           )}
         </div>

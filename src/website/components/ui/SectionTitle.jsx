@@ -21,7 +21,8 @@ const SectionTitle = ({
           text-3xl
           md:text-4xl
           font-bold
-          text-white
+          text-zinc-900
+          dark:text-white
         "
       >
         {title}
@@ -31,7 +32,8 @@ const SectionTitle = ({
         <p
           className="
             mt-4
-            text-zinc-400
+            text-zinc-600
+            dark:text-zinc-400
             max-w-2xl
           "
         >
