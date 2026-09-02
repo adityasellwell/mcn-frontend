@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import usePageTitle from "../../hooks/usePageTitle";
-import { ClipboardCheck, Search, UserPlus } from "lucide-react";
+import {
+  ClipboardCheck,
+  Search,
+  UserPlus,
+  MapPin,
+  Clock3,
+  CalendarDays,
+  CheckCircle2,
+  XCircle,
+  Clock,
+} from "lucide-react";
 import {
   fetchMeetingAttendance,
   markMemberAttendance,
@@ -18,17 +28,18 @@ import toast from "react-hot-toast";
 // ─────────────────────────────────────────────
 const AttendanceBadge = ({ status }) => {
   const map = {
-    PRESENT: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    ABSENT:  "bg-rose-500/10 text-rose-400 border-rose-500/20",
-    LATE:    "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+    PRESENT: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
+    ABSENT:  "bg-rose-500/10 text-rose-400 border-rose-500/25",
+    LATE:    "bg-yellow-500/10 text-yellow-400 border-yellow-500/25",
   };
   if (!status) return (
-    <span className="px-2.5 py-1 rounded-full text-xs font-medium border bg-slate-500/10 text-slate-400 border-slate-500/20">
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border bg-white/5 text-[#8b9bc0] border-white/10">
+      <span className="h-1.5 w-1.5 rounded-full bg-[#8b9bc0]" />
       Not Marked
     </span>
   );
   return (
-    <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${map[status]}`}>
+    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${map[status]}`}>
       {status}
     </span>
   );
@@ -198,12 +209,25 @@ const Attendance = () => {
 
         {/* Selected Meeting Info */}
         {selectedMeeting && (
-          <div className="mt-4 flex flex-wrap gap-4 text-sm text-[#a8b8d4]">
-            <span>📍 {selectedMeeting.address}</span>
-            <span>🕒 {selectedMeeting.startTime} – {selectedMeeting.endTime}</span>
-            <span>📅 {new Date(selectedMeeting.meetingDate).toLocaleDateString("en-IN", {
-              day: "numeric", month: "long", year: "numeric"
-            })}</span>
+          <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-[#a8b8d4]">
+                <CalendarDays size={13} className="text-[#6b7ea3] shrink-0" />
+                {new Date(selectedMeeting.meetingDate).toLocaleDateString("en-IN", {
+                  day: "numeric", month: "long", year: "numeric",
+                })}
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-[#a8b8d4]">
+                <Clock3 size={13} className="text-[#6b7ea3] shrink-0" />
+                {selectedMeeting.startTime} – {selectedMeeting.endTime}
+              </span>
+            </div>
+            <p className="flex items-start gap-1.5 text-sm text-[#a8b8d4] leading-relaxed">
+              <MapPin size={15} className="text-[#6b7ea3] shrink-0 mt-0.5" />
+              <span className="whitespace-pre-line">
+                {selectedMeeting.address.replace(/^\s*[📍\s]+/, "")}
+              </span>
+            </p>
           </div>
         )}
       </div>
@@ -257,44 +281,49 @@ const Attendance = () => {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left">
                     <thead>
-                      <tr className="border-b border-white/5">
-                        <th className="px-5 py-3 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Member</th>
-                        <th className="px-5 py-3 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Code</th>
-                        <th className="px-5 py-3 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Status</th>
-                        <th className="px-5 py-3 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Mark</th>
+                      <tr className="bg-white/[0.03] border-b border-white/5">
+                        <th className="px-5 py-3.5 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Member</th>
+                        <th className="px-5 py-3.5 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Code</th>
+                        <th className="px-5 py-3.5 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Status</th>
+                        <th className="px-5 py-3.5 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Mark</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
                       {attendance.members.map((mm) => (
-                        <tr key={mm.id} className="hover:bg-white/[0.02]">
-                          <td className="px-5 py-3 text-white">
+                        <tr key={mm.id} className="hover:bg-white/[0.03] transition-colors">
+                          <td className="px-5 py-4 text-white font-medium">
                             {mm.member?.firstName} {mm.member?.lastName}
                           </td>
-                          <td className="px-5 py-3">
-                            <span className="font-mono text-xs text-[#6b7ea3]">
+                          <td className="px-5 py-4">
+                            <span className="font-mono text-xs text-[#8b9bc0] bg-white/5 px-2 py-1 rounded-md">
                               {mm.member?.memberCode}
                             </span>
                           </td>
-                          <td className="px-5 py-3">
+                          <td className="px-5 py-4">
                             <AttendanceBadge status={mm.attendanceStatus} />
                           </td>
-                          <td className="px-5 py-3">
+                          <td className="px-5 py-4">
                             <div className="flex items-center gap-2">
-                              {["PRESENT", "ABSENT", "LATE"].map((s) => (
+                              {[
+                                { s: "PRESENT", Icon: CheckCircle2 },
+                                { s: "ABSENT", Icon: XCircle },
+                                { s: "LATE", Icon: Clock },
+                              ].map(({ s, Icon }) => (
                                 <button
                                   key={s}
                                   onClick={() => handleMemberAttendance(mm.id, s)}
-                                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition border ${
+                                  className={`inline-flex items-center gap-1.5 min-w-[92px] justify-center px-3 py-1.5 rounded-lg text-xs font-semibold transition border ${
                                     mm.attendanceStatus === s
                                       ? s === "PRESENT"
-                                        ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+                                        ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
                                         : s === "ABSENT"
-                                        ? "bg-rose-500/20 text-rose-400 border-rose-500/30"
-                                        : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-                                      : "bg-white/5 text-[#6b7ea3] border-white/10 hover:bg-white/10"
+                                        ? "bg-rose-500/20 text-rose-400 border-rose-500/40"
+                                        : "bg-yellow-500/20 text-yellow-400 border-yellow-500/40"
+                                      : "bg-white/5 text-[#8b9bc0] border-white/10 hover:bg-white/10 hover:text-white"
                                   }`}
                                 >
-                                  {s}
+                                  <Icon size={13} />
+                                  {s.charAt(0) + s.slice(1).toLowerCase()}
                                 </button>
                               ))}
                             </div>
@@ -347,42 +376,47 @@ const Attendance = () => {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left">
                     <thead>
-                      <tr className="border-b border-white/5">
-                        <th className="px-5 py-3 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Visitor</th>
-                        <th className="px-5 py-3 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Phone</th>
-                        <th className="px-5 py-3 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Status</th>
-                        <th className="px-5 py-3 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Mark</th>
+                      <tr className="bg-white/[0.03] border-b border-white/5">
+                        <th className="px-5 py-3.5 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Visitor</th>
+                        <th className="px-5 py-3.5 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Phone</th>
+                        <th className="px-5 py-3.5 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Status</th>
+                        <th className="px-5 py-3.5 text-xs font-medium text-[#6b7ea3] uppercase tracking-wider">Mark</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
                       {attendance.visitors.map((mv) => (
-                        <tr key={mv.id} className="hover:bg-white/[0.02]">
-                          <td className="px-5 py-3 text-white">
+                        <tr key={mv.id} className="hover:bg-white/[0.03] transition-colors">
+                          <td className="px-5 py-4 text-white font-medium">
                             {mv.visitor?.firstName} {mv.visitor?.lastName || ""}
                           </td>
-                          <td className="px-5 py-3 text-[#a8b8d4]">
+                          <td className="px-5 py-4 text-[#a8b8d4]">
                             {mv.visitor?.phone}
                           </td>
-                          <td className="px-5 py-3">
+                          <td className="px-5 py-4">
                             <AttendanceBadge status={mv.attendanceStatus} />
                           </td>
-                          <td className="px-5 py-3">
+                          <td className="px-5 py-4">
                             <div className="flex items-center gap-2">
-                              {["PRESENT", "ABSENT", "LATE"].map((s) => (
+                              {[
+                                { s: "PRESENT", Icon: CheckCircle2 },
+                                { s: "ABSENT", Icon: XCircle },
+                                { s: "LATE", Icon: Clock },
+                              ].map(({ s, Icon }) => (
                                 <button
                                   key={s}
                                   onClick={() => handleVisitorAttendance(mv.id, s)}
-                                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition border ${
+                                  className={`inline-flex items-center gap-1.5 min-w-[92px] justify-center px-3 py-1.5 rounded-lg text-xs font-semibold transition border ${
                                     mv.attendanceStatus === s
                                       ? s === "PRESENT"
-                                        ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+                                        ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
                                         : s === "ABSENT"
-                                        ? "bg-rose-500/20 text-rose-400 border-rose-500/30"
-                                        : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-                                      : "bg-white/5 text-[#6b7ea3] border-white/10 hover:bg-white/10"
+                                        ? "bg-rose-500/20 text-rose-400 border-rose-500/40"
+                                        : "bg-yellow-500/20 text-yellow-400 border-yellow-500/40"
+                                      : "bg-white/5 text-[#8b9bc0] border-white/10 hover:bg-white/10 hover:text-white"
                                   }`}
                                 >
-                                  {s}
+                                  <Icon size={13} />
+                                  {s.charAt(0) + s.slice(1).toLowerCase()}
                                 </button>
                               ))}
                             </div>

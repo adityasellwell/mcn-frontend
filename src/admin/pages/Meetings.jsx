@@ -8,6 +8,7 @@ import {
   deleteMeeting,
 } from "../services/meetingService";
 import { fetchChapters } from "../services/chapterService";
+import ConfirmModal from "../components/ConfirmModal";
 import toast from "react-hot-toast";
 
 // ─────────────────────────────────────────────
@@ -308,6 +309,8 @@ const Meetings = () => {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // ─── Load meetings and chapters together ───
   const loadData = async () => {
@@ -342,15 +345,19 @@ const Meetings = () => {
     setModalOpen(true);
   };
 
-  // ─── Deactivate meeting ───
-  const handleDeactivate = async (id) => {
-    if (!window.confirm("Deactivate this meeting?")) return;
+  // ─── Delete meeting permanently ───
+  const handleDeleteConfirmed = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
     try {
-      await deleteMeeting(id);
-      toast.success("Meeting deactivated");
+      await deleteMeeting(deleteTarget.id);
+      toast.success("Meeting permanently deleted");
+      setDeleteTarget(null);
       loadData();
-    } catch {
-      toast.error("Failed to deactivate meeting");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to delete meeting");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -454,15 +461,13 @@ const Meetings = () => {
                           >
                             <Pencil size={15} />
                           </button>
-                          {meeting.status === "ACTIVE" && (
-                            <button
-                              onClick={() => handleDeactivate(meeting.id)}
-                              className="p-1.5 rounded-lg text-[#6b7ea3] hover:text-rose-400 hover:bg-rose-500/10 transition"
-                              title="Deactivate"
-                            >
-                              <Trash2 size={15} />
-                            </button>
-                          )}
+                          <button
+                            onClick={() => setDeleteTarget(meeting)}
+                            className="p-1.5 rounded-lg text-[#6b7ea3] hover:text-rose-400 hover:bg-rose-500/10 transition"
+                            title="Delete Permanently"
+                          >
+                            <Trash2 size={15} />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -483,6 +488,21 @@ const Meetings = () => {
           onSave={handleSave}
         />
       )}
+
+      {/* ── Delete Confirmation ── */}
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Delete meeting permanently?"
+        message={
+          deleteTarget
+            ? `This will permanently delete "${deleteTarget.title}" along with its member/visitor registration and payment records for this meeting. Applications that referenced it are kept, just unlinked. This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete Permanently"
+        loading={deleteLoading}
+        onConfirm={handleDeleteConfirmed}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </>
   );
 };
