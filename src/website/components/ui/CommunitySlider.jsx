@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getSliderImages } from "../../../services/sliderService";
@@ -10,12 +10,36 @@ import { getSliderImages } from "../../../services/sliderService";
  * - Fetches images from the backend on mount.
  * - Renders nothing if no images are available yet.
  * - Supports keyboard navigation and pause on hover.
+ * - Directional slide + subtle Ken Burns zoom per image, matching the
+ *   framer-motion language used across the rest of the site.
  */
+
+const slideVariants = {
+  enter: (direction) => ({
+    x: direction > 0 ? "6%" : "-6%",
+    opacity: 0,
+    scale: 1.02,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    scale: 1,
+  },
+  exit: (direction) => ({
+    x: direction > 0 ? "-6%" : "6%",
+    opacity: 0,
+    scale: 1.02,
+  }),
+};
+
 const CommunitySlider = () => {
   const [images, setImages] = useState([]);
   const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState(1);
   const [loading, setLoading] = useState(true);
   const [paused, setPaused] = useState(false);
+  const currentRef = useRef(current);
+  currentRef.current = current;
 
   useEffect(() => {
     const load = async () => {
@@ -32,11 +56,21 @@ const CommunitySlider = () => {
     load();
   }, []);
 
+  const goTo = useCallback(
+    (index) => {
+      setDirection(index > currentRef.current ? 1 : -1);
+      setCurrent(index);
+    },
+    []
+  );
+
   const next = useCallback(() => {
+    setDirection(1);
     setCurrent((prev) => (prev + 1) % images.length);
   }, [images.length]);
 
   const prev = useCallback(() => {
+    setDirection(-1);
     setCurrent((prev) => (prev - 1 + images.length) % images.length);
   }, [images.length]);
 
@@ -84,30 +118,41 @@ const CommunitySlider = () => {
           onMouseLeave={() => setPaused(false)}
         >
           {/* Images */}
-          <div className="relative w-full h-[340px] sm:h-[460px] lg:h-[560px] bg-zinc-900">
-            <AnimatePresence mode="wait">
+          <div className="relative w-full h-[340px] sm:h-[460px] lg:h-[560px] bg-zinc-900 overflow-hidden">
+            <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={current}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
                 className="absolute inset-0"
               >
-                <img
+                {/* Ken Burns slow zoom on the active image */}
+                <motion.img
                   src={images[current]?.imageUrl}
                   alt={images[current]?.title || `MCN Community ${current + 1}`}
                   className="w-full h-full object-cover"
+                  initial={{ scale: 1 }}
+                  animate={{ scale: paused ? 1 : 1.08 }}
+                  transition={{ duration: 4, ease: "linear" }}
                 />
                 {/* Gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
                 {/* Caption */}
                 {images[current]?.title && (
-                  <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.15 }}
+                    className="absolute bottom-0 left-0 right-0 p-6 z-10"
+                  >
                     <p className="text-white text-lg font-semibold drop-shadow-lg">
                       {images[current].title}
                     </p>
-                  </div>
+                  </motion.div>
                 )}
               </motion.div>
             </AnimatePresence>
@@ -116,7 +161,9 @@ const CommunitySlider = () => {
           {/* Navigation Arrows (only if more than one image) */}
           {images.length > 1 && (
             <>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.92 }}
                 onClick={prev}
                 className="
                   absolute left-4 top-1/2 -translate-y-1/2 z-20
@@ -127,8 +174,10 @@ const CommunitySlider = () => {
                 aria-label="Previous image"
               >
                 <ChevronLeft size={22} />
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.92 }}
                 onClick={next}
                 className="
                   absolute right-4 top-1/2 -translate-y-1/2 z-20
@@ -139,7 +188,7 @@ const CommunitySlider = () => {
                 aria-label="Next image"
               >
                 <ChevronRight size={22} />
-              </button>
+              </motion.button>
             </>
           )}
 
@@ -147,9 +196,11 @@ const CommunitySlider = () => {
           {images.length > 1 && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
               {images.map((_, idx) => (
-                <button
+                <motion.button
                   key={idx}
-                  onClick={() => setCurrent(idx)}
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => goTo(idx)}
                   className={`transition-all duration-300 rounded-full ${
                     idx === current
                       ? "w-6 h-2.5 bg-[#0C831F]"
@@ -164,9 +215,15 @@ const CommunitySlider = () => {
 
         {/* Image Count */}
         {images.length > 1 && (
-          <p className="text-center text-zinc-500 dark:text-zinc-600 text-xs mt-4">
+          <motion.p
+            key={current}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="text-center text-zinc-500 dark:text-zinc-600 text-xs mt-4"
+          >
             {current + 1} / {images.length}
-          </p>
+          </motion.p>
         )}
       </div>
     </section>
