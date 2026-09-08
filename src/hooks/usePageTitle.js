@@ -3,15 +3,13 @@ import { useEffect } from "react";
 const usePageTitle = (title) => {
   useEffect(() => {
     if (title) {
-      if (title.includes("MCN") && !title.includes("MCN Mumbai")) {
-        document.title = title.replace("MCN", "MCN Mumbai");
-      } else if (!title.includes("MCN Mumbai")) {
-        document.title = `${title} - MCN Mumbai`;
+      if (title.includes("Muslim Community Network") || title.includes("MCN")) {
+        document.title = title.replace("MCN", "Muslim Community Network");
       } else {
-        document.title = title;
+        document.title = `${title} — Muslim Community Network`;
       }
     } else {
-      document.title = "MCN Mumbai";
+      document.title = "Muslim Community Network (MCN)";
     }
   }, [title]);
 };
