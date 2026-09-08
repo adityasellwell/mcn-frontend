@@ -85,55 +85,105 @@ const MeetingModal = ({ meeting, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-lg sm:max-w-xl lg:max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-5 border-b border-zinc-800 bg-zinc-950">
-          <div>
-            <h3 className="text-lg font-bold text-white leading-snug">
-              {isAlreadyRegistered ? "Update Meeting Registration" : "Register for Meeting"}
-            </h3>
-            <p className="text-xs text-zinc-400 mt-0.5">{meeting.title}</p>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950/90 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#0C831F]/15 text-[#22C55E] flex items-center justify-center font-bold text-sm shrink-0">
+              <CalendarClock size={20} />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white leading-snug">
+                {isAlreadyRegistered ? "Update Meeting Registration" : "Register for Meeting"}
+              </h3>
+              <p className="text-xs text-zinc-400">
+                {meeting.chapter?.name ? `${meeting.chapter.name} · ` : ""}Event Details &amp; Registration
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition"
+            className="p-2 text-zinc-400 hover:text-white rounded-xl hover:bg-zinc-800 transition"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* Modal Content */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
-          {/* Summary Box */}
-          <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 space-y-2 text-xs text-zinc-300">
-            <div className="flex items-center gap-2 text-zinc-400">
-              <CalendarDays size={14} className="text-[#22C55E]" />
-              <span>{dateFormatted} ({meeting.startTime} – {meeting.endTime})</span>
+        <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto flex-1">
+          {/* Detailed Meeting Info Card */}
+          <div className="bg-zinc-950/90 border border-zinc-800 rounded-2xl p-5 space-y-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                {meeting.chapter?.name && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-800 text-zinc-300 text-xs font-semibold mb-2">
+                    <Building2 size={12} className="text-[#22C55E]" />
+                    {meeting.chapter.name}
+                  </span>
+                )}
+                <h4 className="text-xl font-bold text-white leading-snug">{meeting.title}</h4>
+              </div>
+              <div className="bg-[#0C831F]/15 border border-[#0C831F]/30 rounded-xl px-3.5 py-1.5 text-right">
+                <p className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Registration Fee</p>
+                <p className="text-lg font-bold text-[#22C55E]">₹{feeAmount.toLocaleString("en-IN")}</p>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-zinc-400">
-              <MapPin size={14} className="text-[#22C55E]" />
-              <span className="truncate">{meeting.address || "Venue Details"}</span>
+
+            {/* Event Time & Location Grid */}
+            <div className="grid sm:grid-cols-2 gap-3 text-xs text-zinc-300 pt-2 border-t border-zinc-800/80">
+              <div className="flex items-start gap-2.5">
+                <CalendarDays size={16} className="text-[#22C55E] shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-zinc-500 font-medium">Date &amp; Day</p>
+                  <p className="text-zinc-200 font-semibold text-sm">{dateFormatted}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <Clock3 size={16} className="text-[#22C55E] shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-zinc-500 font-medium">Meeting Time</p>
+                  <p className="text-zinc-200 font-semibold text-sm">{meeting.startTime} – {meeting.endTime}</p>
+                </div>
+              </div>
+
+              <div className="sm:col-span-2 flex items-start gap-2.5 pt-1">
+                <MapPin size={16} className="text-[#22C55E] shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-zinc-500 font-medium">Venue Address</p>
+                  <p className="text-zinc-200 font-semibold text-sm leading-relaxed">{meeting.address || "Venue details will be shared soon."}</p>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-2 pt-1 border-t border-zinc-800/80">
-              <IndianRupee size={14} className="text-[#22C55E]" />
-              <span className="font-semibold text-white">
-                Registration Fee: <span className="text-[#22C55E]">₹{feeAmount.toLocaleString("en-IN")}</span>
-              </span>
-            </div>
+
+            {/* Description & Agenda if available */}
+            {meeting.description && (
+              <div className="pt-3 border-t border-zinc-800/80 space-y-1">
+                <p className="text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">About Event</p>
+                <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-line">{meeting.description}</p>
+              </div>
+            )}
+
+            {meeting.agenda && (
+              <div className="pt-2 space-y-1">
+                <p className="text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">Event Agenda</p>
+                <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-line">{meeting.agenda}</p>
+              </div>
+            )}
           </div>
 
           {/* Payment Method Selection */}
-          <div>
-            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-2">
-              Payment Method <span className="text-red-400">*</span>
+          <div className="space-y-3">
+            <label className="block text-xs font-bold text-zinc-200 uppercase tracking-wider">
+              Select How You Wish To Pay <span className="text-red-400">*</span>
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid sm:grid-cols-2 gap-3">
               <label
-                className={`flex items-start gap-2.5 p-3 rounded-xl border cursor-pointer transition-all ${
+                className={`flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition-all ${
                   paymentMethod === "ONLINE"
-                    ? "border-[#22C55E] bg-green-950/20 text-white"
-                    : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:border-zinc-700"
+                    ? "border-[#22C55E] bg-green-950/30 text-white shadow-lg shadow-green-950/20"
+                    : "border-zinc-800 bg-zinc-950/90 text-zinc-400 hover:border-zinc-700"
                 }`}
               >
                 <input
@@ -142,19 +192,19 @@ const MeetingModal = ({ meeting, onClose, onSuccess }) => {
                   value="ONLINE"
                   checked={paymentMethod === "ONLINE"}
                   onChange={() => setPaymentMethod("ONLINE")}
-                  className="accent-[#22C55E] mt-0.5"
+                  className="accent-[#22C55E] mt-1 w-4 h-4 shrink-0"
                 />
                 <div>
-                  <p className="text-xs font-bold text-white">Pay Now (Online)</p>
-                  <p className="text-[10px] text-zinc-400 mt-0.5">Scan QR & upload receipt/UTR</p>
+                  <p className="text-sm font-bold text-white">Pay Now (Online)</p>
+                  <p className="text-xs text-zinc-400 mt-0.5">Scan QR Code &amp; upload receipt or UTR number</p>
                 </div>
               </label>
 
               <label
-                className={`flex items-start gap-2.5 p-3 rounded-xl border cursor-pointer transition-all ${
+                className={`flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition-all ${
                   paymentMethod === "AT_VENUE"
-                    ? "border-amber-500 bg-amber-950/20 text-white"
-                    : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:border-zinc-700"
+                    ? "border-amber-500 bg-amber-950/30 text-white shadow-lg shadow-amber-950/20"
+                    : "border-zinc-800 bg-zinc-950/90 text-zinc-400 hover:border-zinc-700"
                 }`}
               >
                 <input
@@ -163,61 +213,63 @@ const MeetingModal = ({ meeting, onClose, onSuccess }) => {
                   value="AT_VENUE"
                   checked={paymentMethod === "AT_VENUE"}
                   onChange={() => setPaymentMethod("AT_VENUE")}
-                  className="accent-amber-500 mt-0.5"
+                  className="accent-amber-500 mt-1 w-4 h-4 shrink-0"
                 />
                 <div>
-                  <p className="text-xs font-bold text-white">Pay at Venue</p>
-                  <p className="text-[10px] text-zinc-400 mt-0.5">Bring cash on event day</p>
+                  <p className="text-sm font-bold text-white">Pay at Venue</p>
+                  <p className="text-xs text-zinc-400 mt-0.5">Pay ₹{feeAmount.toLocaleString("en-IN")} cash at the event venue</p>
                 </div>
               </label>
             </div>
           </div>
 
-          {/* Pay Now Section */}
+          {/* Pay Now Inputs */}
           {paymentMethod === "ONLINE" && (
-            <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 space-y-4">
-              <div className="text-center space-y-1">
-                <p className="text-xs text-zinc-400">Scan QR Code to pay ₹{feeAmount.toLocaleString("en-IN")}</p>
+            <div className="bg-zinc-950/90 border border-zinc-800 rounded-2xl p-5 space-y-5">
+              <div className="text-center space-y-2">
+                <p className="text-xs text-zinc-300 font-medium">Scan QR Code to pay <span className="text-[#22C55E] font-bold">₹{feeAmount.toLocaleString("en-IN")}</span></p>
                 <img
                   src={qrImage}
                   alt="QR Code"
-                  className="h-44 w-44 object-contain mx-auto rounded-lg border border-zinc-800 bg-white p-2"
+                  className="h-48 w-48 object-contain mx-auto rounded-xl border border-zinc-700 bg-white p-2.5 shadow-md"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs text-zinc-400 mb-1">12-Digit UTR Number</label>
-                <input
-                  type="text"
-                  placeholder="Enter UTR / Transaction ID"
-                  value={utrNumber}
-                  onChange={(e) => setUtrNumber(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white placeholder:text-zinc-600 outline-none focus:border-[#22C55E]"
-                />
-              </div>
+              <div className="grid sm:grid-cols-2 gap-4 pt-2">
+                <div>
+                  <label className="block text-xs font-medium text-zinc-300 mb-1.5">12-Digit UTR Number</label>
+                  <input
+                    type="text"
+                    placeholder="Enter UTR / Txn ID"
+                    value={utrNumber}
+                    onChange={(e) => setUtrNumber(e.target.value)}
+                    className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-zinc-600 outline-none focus:border-[#22C55E] transition"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-xs text-zinc-400 mb-1">Payment Screenshot</label>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setScreenshot(e.target.files[0])}
-                  className="w-full text-zinc-400 text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:bg-zinc-800 file:text-zinc-200 file:cursor-pointer hover:file:bg-zinc-700"
-                />
+                <div>
+                  <label className="block text-xs font-medium text-zinc-300 mb-1.5">Payment Screenshot</label>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setScreenshot(e.target.files[0])}
+                    className="w-full text-zinc-400 text-xs file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-zinc-800 file:text-zinc-200 file:cursor-pointer hover:file:bg-zinc-700 transition"
+                  />
+                </div>
               </div>
             </div>
           )}
 
-          {/* Pay at Venue Section */}
+          {/* Pay at Venue Confirmation */}
           {paymentMethod === "AT_VENUE" && (
-            <div className="bg-amber-950/20 border border-amber-500/30 rounded-xl p-4 space-y-2">
-              <div className="flex items-center gap-2 text-amber-400 font-semibold text-xs">
-                <Building2 size={16} />
+            <div className="bg-amber-950/20 border border-amber-500/30 rounded-2xl p-5 space-y-2">
+              <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
+                <Building2 size={18} />
                 <span>Pay Cash at Venue</span>
               </div>
-              <p className="text-xs text-amber-200/80 leading-relaxed">
-                Your registration will be recorded. Please bring <strong>₹{feeAmount.toLocaleString("en-IN")}</strong> cash to the meeting venue.
+              <p className="text-xs text-amber-200/90 leading-relaxed">
+                Your registration will be recorded. Please carry <strong>₹{feeAmount.toLocaleString("en-IN")}</strong> cash on the meeting day ({dateFormatted}).
               </p>
             </div>
           )}
@@ -226,7 +278,7 @@ const MeetingModal = ({ meeting, onClose, onSuccess }) => {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 bg-[#0C831F] hover:bg-[#0A6F1A] disabled:opacity-60 text-white font-bold text-sm rounded-xl transition flex items-center justify-center gap-2"
+            className="w-full py-3.5 bg-[#0C831F] hover:bg-[#0A6F1A] disabled:opacity-60 text-white font-bold text-sm rounded-2xl transition shadow-lg shadow-green-950/40 flex items-center justify-center gap-2"
           >
             {submitting && <Loader2 size={16} className="animate-spin" />}
             {paymentMethod === "ONLINE"
