@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import usePageTitle from "../../hooks/usePageTitle";
-import { Plus, Trash2, X, GitMerge, ChevronDown } from "lucide-react";
+import { Plus, Trash2, X, GitMerge, ChevronDown, Download } from "lucide-react";
 import {
   fetchReferrals,
   fetchReferralStats,
@@ -267,6 +267,32 @@ const Referrals = () => {
     ? referrals.filter((r) => r.status === statusFilter)
     : referrals;
 
+  // ─── Download current list as CSV ───
+  const downloadCsv = () => {
+    const rows = [
+      ["Given By", "Given By Code", "Received By", "Received By Code", "Title", "Description", "Value (₹)", "Status", "Date"],
+      ...filtered.map((r) => [
+        `${r.givenByMember?.firstName || ""} ${r.givenByMember?.lastName || ""}`.trim(),
+        r.givenByMember?.memberCode || "",
+        `${r.receivedByMember?.firstName || ""} ${r.receivedByMember?.lastName || ""}`.trim(),
+        r.receivedByMember?.memberCode || "",
+        r.title,
+        r.description || "",
+        r.referralValue != null ? Number(r.referralValue) : "",
+        r.status,
+        new Date(r.createdAt).toLocaleDateString("en-IN"),
+      ]),
+    ];
+    const csv = rows.map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `mcn-referrals-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <>
       <div className="space-y-6">
@@ -277,13 +303,22 @@ const Referrals = () => {
             <h2 className="text-2xl font-bold text-white">Referrals</h2>
             <p className="text-sm text-[#6b7ea3] mt-1">Track member referrals</p>
           </div>
-          <button
-            onClick={() => setModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-sm text-white font-medium transition"
-          >
-            <Plus size={16} />
-            Add Referral
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={downloadCsv}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#162040] border border-white/10 hover:border-white/20 text-sm text-white font-medium transition"
+            >
+              <Download size={15} />
+              Download CSV
+            </button>
+            <button
+              onClick={() => setModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-sm text-white font-medium transition"
+            >
+              <Plus size={16} />
+              Add Referral
+            </button>
+          </div>
         </div>
 
         {/* ── Stats Row ── */}

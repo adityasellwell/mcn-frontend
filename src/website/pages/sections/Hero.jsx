@@ -25,14 +25,20 @@ const Hero = () => {
     <section
       id="hero"
       className="
+        relative
         pt-8
-        pb-8
-        lg:pt-10
-        lg:pb-12
-        bg-white
+        pb-12
+        lg:pt-12
+        lg:pb-16
+        bg-zinc-50/60
         dark:bg-zinc-950
+        overflow-hidden
       "
     >
+      {/* Soft Ambient Light in Light & Dark mode */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full bg-[#0C831F]/5 dark:bg-[#0C831F]/10 blur-3xl" />
+      </div>
       <Container>
         <div
           className="

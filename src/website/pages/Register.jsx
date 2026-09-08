@@ -38,6 +38,9 @@ const Register = () => {
     referredBy: "",
     utrNumber: "",
     screenshot: null,
+    isBniMember: "",   // "yes" | "no" | "" (required for MEMBER)
+    bniChapter: "",
+    paymentMethod: "", // "ONLINE" | "AT_VENUE" | ""
   });
 
   const [socialLinks, setSocialLinks] =
@@ -189,182 +192,149 @@ const handleSubmit = async (e) => {
   setLoading(true);
 
   try {
-    if (
-      !formData.utrNumber &&
-      !formData.screenshot
-    ) {
-      toast.error(
-        "Please provide UTR Number or Payment Screenshot"
-      );
+    const isPayingOnline = formData.paymentMethod === "ONLINE";
 
+    // Only require payment proof for online payments
+    if (isPayingOnline && !formData.utrNumber && !formData.screenshot) {
+      toast.error("Please provide UTR Number or Payment Screenshot");
       return;
     }
 
     const validationErrors = {};
 
     if (!registrationType) {
-      validationErrors.registrationType =
-        "Please select registration type";
+      validationErrors.registrationType = "Please select registration type";
     }
 
     if (!formData.chapterId) {
-      validationErrors.chapterId =
-        "Please select a chapter";
+      validationErrors.chapterId = "Please select a chapter";
     }
 
     if (!formData.fullName.trim()) {
-        validationErrors.fullName =
-          "Full Name is required";
-      } else if (
-        formData.fullName.trim().length < 4
-      ) {
-        validationErrors.fullName =
-          "Full Name must be at least 4 characters";
-      } else if (
-        formData.fullName.trim().length > 50
-      ) {
-        validationErrors.fullName =
-          "Full Name cannot exceed 50 characters";
-      } else if (
-        !/^[A-Za-z\s]+$/.test(
-          formData.fullName.trim()
-        )
-      ) {
-        validationErrors.fullName =
-          "Full Name can only contain letters and spaces";
-      }
+      validationErrors.fullName = "Full Name is required";
+    } else if (formData.fullName.trim().length < 4) {
+      validationErrors.fullName = "Full Name must be at least 4 characters";
+    } else if (formData.fullName.trim().length > 50) {
+      validationErrors.fullName = "Full Name cannot exceed 50 characters";
+    } else if (!/^[A-Za-z\s]+$/.test(formData.fullName.trim())) {
+      validationErrors.fullName = "Full Name can only contain letters and spaces";
+    }
 
     if (!formData.mobile.trim()) {
-          validationErrors.mobile =
-            "Mobile Number is required";
-        } else if (
-          !/^[6-9]\d{9}$/.test(
-            formData.mobile
-          )
-        ) {
-          validationErrors.mobile =
-            "Enter valid 10 digit mobile number";
-        }
+      validationErrors.mobile = "Mobile Number is required";
+    } else if (!/^[6-9]\d{9}$/.test(formData.mobile)) {
+      validationErrors.mobile = "Enter valid 10 digit mobile number";
+    }
 
     if (!formData.email.trim()) {
-        validationErrors.email =
-          "Email is required";
-      } else if (
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-          formData.email
-        )
-      ) {
-        validationErrors.email =
-          "Enter a valid email address";
-      }
+      validationErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      validationErrors.email = "Enter a valid email address";
+    }
 
     if (!formData.companyName.trim()) {
-        validationErrors.companyName =
-          "Company Name is required";
-      } else if (
-        formData.companyName.trim().length < 2
-      ) {
-        validationErrors.companyName =
-          "Company Name must be at least 2 characters";
-      }
+      validationErrors.companyName = "Company Name is required";
+    } else if (formData.companyName.trim().length < 2) {
+      validationErrors.companyName = "Company Name must be at least 2 characters";
+    }
 
     if (!formData.businessCategory.trim()) {
-        validationErrors.businessCategory =
-          "Business Category is required";
-      } else if (
-        formData.businessCategory.trim().length < 3
-      ) {
-        validationErrors.businessCategory =
-          "Business Category must be at least 3 characters";
-      }
+      validationErrors.businessCategory = "Business Category is required";
+    } else if (formData.businessCategory.trim().length < 3) {
+      validationErrors.businessCategory = "Business Category must be at least 3 characters";
+    }
 
     if (!formData.address.trim()) {
-          validationErrors.address =
-            "Address is required";
-        } else if (
-          formData.address.trim().length < 10
-        ) {
-          validationErrors.address =
-            "Please enter a complete address";
-        }
+      validationErrors.address = "Address is required";
+    } else if (formData.address.trim().length < 10) {
+      validationErrors.address = "Please enter a complete address";
+    }
 
-    if (
-      Object.keys(validationErrors).length
-    ) {
+    // ─── BNI validation — required for MEMBER ───
+    if (registrationType === "MEMBER") {
+      if (!formData.isBniMember) {
+        validationErrors.isBniMember = "Please indicate if you are a BNI member";
+      }
+      if (formData.isBniMember === "yes" && !formData.bniChapter.trim()) {
+        validationErrors.bniChapter = "BNI Chapter name is required";
+      }
+    }
+
+    // ─── Payment method required ───
+    if (!formData.paymentMethod) {
+      validationErrors.paymentMethod = "Please select a payment method";
+    }
+
+    if (Object.keys(validationErrors).length) {
       setErrors(validationErrors);
       return;
     }
 
     const selectedChapter = chapters.find(
-        (chapter) =>
-          chapter.id === Number(formData.chapterId)
-      );
+      (chapter) => chapter.id === Number(formData.chapterId)
+    );
 
-     
     const payload = {
-          registrationType,
-          chapterName: selectedChapter?.name || null,
-          chapterId: formData.chapterId,
-          meetingId: selectedMeeting?.id || null,
-          fullName: formData.fullName,
-          mobile: formData.mobile,
-          email: formData.email,
-          companyName: formData.companyName,
-          businessCategory: formData.businessCategory,
-          website: formData.website || null,
-          // ─── Filter out empty social links before sending ───
-          socialProfiles: socialLinks.filter(
-            (link) => link.platform && link.url
-          ),
-          address: formData.address,
-          referredBy: registrationType === "VISITOR" ? formData.referredBy || null : null,
-          utrNumber: formData.utrNumber || null,
-          screenshot: formData.screenshot,
-        };
+      registrationType,
+      chapterName: selectedChapter?.name || null,
+      chapterId: formData.chapterId,
+      meetingId: selectedMeeting?.id || null,
+      fullName: formData.fullName,
+      mobile: formData.mobile,
+      email: formData.email,
+      companyName: formData.companyName,
+      businessCategory: formData.businessCategory,
+      website: formData.website || null,
+      socialProfiles: socialLinks.filter((link) => link.platform && link.url),
+      address: formData.address,
+      referredBy: registrationType === "VISITOR" ? formData.referredBy || null : null,
+      utrNumber: isPayingOnline ? formData.utrNumber || null : null,
+      screenshot: isPayingOnline ? formData.screenshot : null,
+      isBniMember: formData.isBniMember === "yes",
+      bniChapter: formData.isBniMember === "yes" ? formData.bniChapter : null,
+      paymentMethod: formData.paymentMethod,
+    };
 
-        console.log("Payload socialProfiles:", payload.socialProfiles);
-    const response =
-      await createApplication(payload);
+    const response = await createApplication(payload);
 
     toast.success(response.message);
 
     if (response.data.meeting) {
-        setSelectedMeeting(response.data.meeting);
-      }
+      setSelectedMeeting(response.data.meeting);
+    }
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
 
     // ─── Reset all form state ───
-        setRegistrationType("");
-        setSelectedMeeting(null);
-        setSocialLinks([{ platform: "", url: "" }]); // ← add this line
-        setFormData({
-          chapterId: "",
-          fullName: "",
-          mobile: "",
-          email: "",
-          companyName: "",
-          businessCategory: "",
-          website: "",
-          socialLinks: [],
-          address: "",
-          referredBy: "",
-          utrNumber: "",
-          screenshot: null,
-        });
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
+    setRegistrationType("");
+    setSelectedMeeting(null);
+    setSocialLinks([{ platform: "", url: "" }]);
+    setFormData({
+      chapterId: "",
+      fullName: "",
+      mobile: "",
+      email: "",
+      companyName: "",
+      businessCategory: "",
+      website: "",
+      socialLinks: [],
+      address: "",
+      referredBy: "",
+      utrNumber: "",
+      screenshot: null,
+      isBniMember: "",
+      bniChapter: "",
+      paymentMethod: "",
+    });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
 
   } catch (error) {
     console.error(error);
-
-    toast.error(
-      error?.response?.data?.message ||
-      "Something went wrong"
-    );
+    toast.error(error?.response?.data?.message || "Something went wrong");
   } finally {
     isSubmittingRef.current = false;
     setLoading(false);
@@ -427,12 +397,14 @@ useEffect(() => {
         w-full
         max-w-4xl
         p-8
+        sm:p-10
         rounded-3xl
         border
-        border-zinc-200
+        border-zinc-200/90
         dark:border-zinc-800
-        bg-zinc-50
+        bg-white
         dark:bg-zinc-900
+        shadow-sm
       "
     >
       <h1
@@ -867,6 +839,60 @@ useEffect(() => {
           />
         </div>
 
+        {/* BNI Member — required for MEMBER type */}
+        {registrationType === "MEMBER" && (
+          <div className="md:col-span-2 border border-zinc-200 dark:border-zinc-700 rounded-xl p-4 bg-zinc-50 dark:bg-zinc-800/50 space-y-4">
+            <div>
+              <p className="text-zinc-900 dark:text-white font-medium text-sm mb-3">
+                Are you a BNI Member? <span className="text-red-500">*</span>
+              </p>
+              <div className="flex gap-6">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="isBniMember"
+                    value="yes"
+                    checked={formData.isBniMember === "yes"}
+                    onChange={handleChange}
+                    className="accent-[#0C831F] w-4 h-4"
+                  />
+                  <span className="text-zinc-700 dark:text-zinc-300 text-sm">Yes</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="isBniMember"
+                    value="no"
+                    checked={formData.isBniMember === "no"}
+                    onChange={handleChange}
+                    className="accent-[#0C831F] w-4 h-4"
+                  />
+                  <span className="text-zinc-700 dark:text-zinc-300 text-sm">No</span>
+                </label>
+              </div>
+              {errors.isBniMember && (
+                <p className="text-red-500 text-sm mt-2">{errors.isBniMember}</p>
+              )}
+            </div>
+
+            {formData.isBniMember === "yes" && (
+              <div>
+                <input
+                  type="text"
+                  name="bniChapter"
+                  placeholder="Enter your BNI Chapter Name *"
+                  className={`input ${errors.bniChapter ? "border-red-500" : ""}`}
+                  value={formData.bniChapter}
+                  onChange={handleChange}
+                />
+                {errors.bniChapter && (
+                  <p className="text-red-500 text-sm mt-1">{errors.bniChapter}</p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Social Profiles */}
 
        <div className="md:col-span-2">
@@ -1103,94 +1129,155 @@ useEffect(() => {
           />
         )}
 
-        {/* Payment Section */}
-
-        <div
-            className="
-              md:col-span-2
-              border
-              border-zinc-200
-              dark:border-zinc-800
-              rounded-2xl
-              p-5
-              bg-zinc-100/50
-              dark:bg-zinc-950
-              text-center
-            "
-          >
-            <h3 className="text-zinc-900 dark:text-white font-semibold text-lg">
-              Registration Fee
-            </h3>
-
-            <p className="text-green-500 text-3xl font-bold mt-2">
-              ₹{selectedMeeting?.meetingFee ? Number(selectedMeeting.meetingFee) : 1000}
-            </p>
-
-            <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-2">
-              Scan the QR code and complete your payment.
-            </p>
-
-            <div
-              className="
-                w-full
-                max-w-md
-                mx-auto
-                mt-5
-                rounded-xl
-                overflow-hidden
-              "
-            >
-             <img
-                src={qrImage}
-                alt="QR"
-                className="w-64 h-64 object-contain mx-auto rounded-xl"
-              />
-            </div>
-          </div>
-
-        {/* Screenshot upload and UTR Section*/}
-
+        {/* Payment Method Selection */}
 
         <div className="md:col-span-2">
-          <h4 className="text-zinc-900 dark:text-white font-medium mb-3">
-            Payment Proof
-          </h4>
-
-          <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4">
-            Upload Screenshot or Enter UTR Number (either one is required)
+          <p className="text-zinc-900 dark:text-white font-medium mb-3">
+            How would you like to pay? <span className="text-red-500">*</span>
           </p>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <label
+              className={`flex items-start gap-3 border rounded-xl p-4 cursor-pointer transition-all ${
+                formData.paymentMethod === "ONLINE"
+                  ? "border-[#0C831F] bg-green-50 dark:bg-green-950/20"
+                  : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500"
+              }`}
+            >
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="ONLINE"
+                checked={formData.paymentMethod === "ONLINE"}
+                onChange={handleChange}
+                className="accent-[#0C831F] mt-0.5 w-4 h-4 shrink-0"
+              />
+              <div>
+                <p className="text-zinc-900 dark:text-white font-medium text-sm">Pay Now (Online)</p>
+                <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-0.5">Scan QR & upload payment screenshot or UTR</p>
+              </div>
+            </label>
+
+            <label
+              className={`flex items-start gap-3 border rounded-xl p-4 cursor-pointer transition-all ${
+                formData.paymentMethod === "AT_VENUE"
+                  ? "border-amber-500 bg-amber-50 dark:bg-amber-950/20"
+                  : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500"
+              }`}
+            >
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="AT_VENUE"
+                checked={formData.paymentMethod === "AT_VENUE"}
+                onChange={handleChange}
+                className="accent-amber-500 mt-0.5 w-4 h-4 shrink-0"
+              />
+              <div>
+                <p className="text-zinc-900 dark:text-white font-medium text-sm">Pay at the Venue</p>
+                <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-0.5">Bring cash on the meeting day</p>
+              </div>
+            </label>
+          </div>
+          {errors.paymentMethod && (
+            <p className="text-red-500 text-sm mt-2">{errors.paymentMethod}</p>
+          )}
         </div>
 
-        <div className="md:col-span-2 grid md:grid-cols-2 gap-4">
-  
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="
-              input
-              text-zinc-700
-              dark:text-white
-              file:mr-4
-              file:py-2
-              file:px-4
-              file:rounded-lg
-              file:border-0
-              file:bg-[#0C831F]
-              file:text-white
-            "
-            onChange={handleFileChange}
-          />
+        {/* Pay Now — QR + proof */}
+        {formData.paymentMethod === "ONLINE" && (
+          <>
+            <div
+              className="
+                md:col-span-2
+                border
+                border-zinc-200
+                dark:border-zinc-800
+                rounded-2xl
+                p-5
+                bg-zinc-100/50
+                dark:bg-zinc-950
+                text-center
+              "
+            >
+              <h3 className="text-zinc-900 dark:text-white font-semibold text-lg">
+                Registration Fee
+              </h3>
 
-          <input
-            type="text"
-            name="utrNumber"
-            placeholder="Enter UTR Number"
-            className="input"
-            value={formData.utrNumber}
-            onChange={handleChange}
-          />
-        </div>
+              <p className="text-green-500 text-3xl font-bold mt-2">
+                ₹{selectedMeeting?.meetingFee ? Number(selectedMeeting.meetingFee) : 1000}
+              </p>
+
+              <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-2">
+                Scan the QR code and complete your payment.
+              </p>
+
+              <div className="w-full max-w-md mx-auto mt-5 rounded-xl overflow-hidden">
+                <img
+                  src={qrImage}
+                  alt="QR"
+                  className="w-64 h-64 object-contain mx-auto rounded-xl"
+                />
+              </div>
+            </div>
+
+            {/* Screenshot upload and UTR Section*/}
+            <div className="md:col-span-2">
+              <h4 className="text-zinc-900 dark:text-white font-medium mb-3">
+                Payment Proof
+              </h4>
+              <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4">
+                Upload Screenshot or Enter UTR Number (either one is required)
+              </p>
+            </div>
+
+            <div className="md:col-span-2 grid md:grid-cols-2 gap-4">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="
+                  input
+                  text-zinc-700
+                  dark:text-white
+                  file:mr-4
+                  file:py-2
+                  file:px-4
+                  file:rounded-lg
+                  file:border-0
+                  file:bg-[#0C831F]
+                  file:text-white
+                "
+                onChange={handleFileChange}
+              />
+
+              <input
+                type="text"
+                name="utrNumber"
+                placeholder="Enter UTR Number"
+                className="input"
+                value={formData.utrNumber}
+                onChange={handleChange}
+              />
+            </div>
+          </>
+        )}
+
+        {/* Pay at Venue — confirmation message */}
+        {formData.paymentMethod === "AT_VENUE" && (
+          <div className="md:col-span-2 border border-amber-400 dark:border-amber-600 rounded-xl p-5 bg-amber-50 dark:bg-amber-950/20">
+            <h3 className="text-amber-700 dark:text-amber-400 font-semibold">
+              Pay at the Venue
+            </h3>
+            <p className="text-amber-800 dark:text-amber-300 text-sm mt-2 leading-relaxed">
+              You have chosen to pay at the venue. Please carry{" "}
+              <strong>₹{selectedMeeting?.meetingFee ? Number(selectedMeeting.meetingFee) : 1000}</strong>{" "}
+              cash on the meeting day. Your registration will be marked as{" "}
+              <strong>Pending Payment</strong> until confirmed by the admin.
+            </p>
+          </div>
+        )}
+
+
 
         {/* Submit */}
 

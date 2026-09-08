@@ -54,9 +54,8 @@ const MeetingsPreview = () => {
               text-sm
               uppercase
               tracking-[0.3em]
-              text-zinc-500
-              dark:text-zinc-500
-              font-medium
+              text-[#0C831F]
+              font-bold
             "
           >
             MEETINGS

@@ -141,6 +141,13 @@ const ViewModal = ({ member, onClose, onStatusChange, onDelete, onImpersonate })
                   ? new Date(member.membershipExpiry).toLocaleDateString("en-IN")
                   : null}
               />
+              <Field
+                label="BNI Member"
+                value={member.isBniMember ? "Yes" : "No"}
+              />
+              {member.isBniMember && (
+                <Field label="BNI Chapter" value={member.bniChapter || "—"} />
+              )}
             </div>
           </div>
 

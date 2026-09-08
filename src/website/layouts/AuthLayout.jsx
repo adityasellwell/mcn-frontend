@@ -8,7 +8,7 @@ const AuthLayout = () => {
     <div
       className="
         min-h-screen
-        bg-white
+        bg-zinc-50/60
         dark:bg-zinc-950
         text-zinc-900
         dark:text-white

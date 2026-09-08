@@ -54,18 +54,15 @@ const GetInvitedSection = () => {
           className="
             max-w-5xl
             mx-auto
-
             rounded-3xl
-
             border
-            border-zinc-200
+            border-zinc-200/90
             dark:border-zinc-800
-
-            bg-zinc-50
+            bg-zinc-50/80
             dark:bg-zinc-900
-
             p-8
             lg:p-10
+            shadow-sm
           "
         >
           {/* Heading */}

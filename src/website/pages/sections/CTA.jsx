@@ -38,11 +38,11 @@ const CTA = () => {
             rounded-[32px]
 
             border
-            border-zinc-200
+            border-zinc-200/90
             dark:border-zinc-800
-
-            bg-zinc-50
+            bg-zinc-50/80
             dark:bg-zinc-900
+            shadow-sm
 
             px-8
             py-16

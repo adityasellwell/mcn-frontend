@@ -1,26 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Mail, MapPin, Phone, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import Container from "../../components/ui/Container";
 import api from "../../../services/api";
 import toast from "react-hot-toast";
 
+// ─── Static contact info — matches Footer data exactly ───
+const CONTACT_EMAIL = "support@mcnmumbai.com";
+const CONTACT_PHONE = "+91 84440 40514";
+
 const Contact = () => {
-  const [contact, setContact] = useState({ email: null, phone: null });
   const [fullName, setFullName] = useState("");
   const [emailInput, setEmailInput] = useState("");
   const [phoneInput, setPhoneInput] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    api.get("/admin/contact")
-      .then((res) => setContact(res.data?.data || {}))
-      .catch(() => {});
-  }, []);
-
-  const email = contact.email || "mcnmumbai@gmail.com";
-  const phone = contact.phone ? `+91 ${contact.phone}` : "+91 90000 00000";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,9 +55,9 @@ const Contact = () => {
     <section
       id="contact"
       className="
-        py-12
-        lg:py-16
-        bg-white
+        py-14
+        lg:py-18
+        bg-zinc-50/60
         dark:bg-zinc-950
       "
     >
@@ -85,9 +79,8 @@ const Contact = () => {
               text-sm
               uppercase
               tracking-[0.3em]
-              text-zinc-500
-              dark:text-zinc-500
-              font-medium
+              text-[#0C831F]
+              font-bold
             "
           >
             CONTACT
@@ -95,9 +88,9 @@ const Contact = () => {
 
           <h2
             className="
-              mt-6
+              mt-4
               text-4xl
-              lg:text-6xl
+              lg:text-5xl
               font-bold
               text-zinc-900
               dark:text-white
@@ -108,14 +101,14 @@ const Contact = () => {
 
           <p
             className="
-              mt-6
+              mt-4
               text-zinc-600
               dark:text-zinc-400
-              text-lg
+              text-base
+              lg:text-lg
             "
           >
-            Have questions about MCN?
-            We'd love to hear from you.
+            Have questions about MCN? We'd love to hear from you.
           </p>
         </motion.div>
 
@@ -138,10 +131,11 @@ const Contact = () => {
               p-8
               rounded-3xl
               border
-              border-zinc-200
+              border-zinc-200/90
               dark:border-zinc-800
-              bg-zinc-50
+              bg-white
               dark:bg-zinc-900
+              shadow-sm
             "
           >
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -287,10 +281,11 @@ const Contact = () => {
               p-8
               rounded-3xl
               border
-              border-zinc-200
+              border-zinc-200/90
               dark:border-zinc-800
-              bg-zinc-50
+              bg-white
               dark:bg-zinc-900
+              shadow-sm
               space-y-8
             "
           >
@@ -300,10 +295,10 @@ const Contact = () => {
               <div>
                 <h4 className="font-semibold text-zinc-900 dark:text-white">Email</h4>
                 <a
-                  href={`mailto:${email}`}
+                  href={`mailto:${CONTACT_EMAIL}`}
                   className="text-zinc-600 dark:text-zinc-400 hover:text-[#22C55E] transition-colors break-all"
                 >
-                  {email}
+                  {CONTACT_EMAIL}
                 </a>
               </div>
             </div>
@@ -314,10 +309,10 @@ const Contact = () => {
               <div>
                 <h4 className="font-semibold text-zinc-900 dark:text-white">Phone</h4>
                 <a
-                  href={`tel:${phone.replace(/\s/g, "")}`}
+                  href="tel:+918444040514"
                   className="text-zinc-600 dark:text-zinc-400 hover:text-[#22C55E] transition-colors"
                 >
-                  {phone}
+                  {CONTACT_PHONE}
                 </a>
               </div>
             </div>

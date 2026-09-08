@@ -20,29 +20,25 @@ const StepCard = ({
 }) => {
   return (
     <motion.div
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.97 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       className="
         relative
         p-8
-
         rounded-3xl
-
         border
-        border-zinc-200
+        border-zinc-200/90
         dark:border-zinc-800
-
-        bg-zinc-50
+        bg-white
         dark:bg-zinc-900
-
+        shadow-sm
+        hover:shadow-xl
+        hover:shadow-green-900/5
+        dark:hover:shadow-black/30
         transition-all
         duration-300
-
         hover:border-[#0C831F]
         dark:hover:border-[#0C831F]
-        hover:shadow-xl
-        hover:shadow-black/5
-        dark:hover:shadow-black/20
       "
     >
       {/* Step Number */}
@@ -50,8 +46,8 @@ const StepCard = ({
       <span
         className="
           text-5xl
-          font-bold
-          text-zinc-300
+          font-extrabold
+          text-[#0C831F]/20
           dark:text-zinc-700
         "
       >
@@ -62,9 +58,9 @@ const StepCard = ({
 
       <h3
         className="
-          mt-4
-          text-2xl
-          font-semibold
+          mt-3
+          text-xl
+          font-bold
           text-zinc-900
           dark:text-white
         "
@@ -80,6 +76,8 @@ const StepCard = ({
           text-zinc-600
           dark:text-zinc-400
           leading-relaxed
+          text-sm
+          lg:text-base
         "
       >
         {description}

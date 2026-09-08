@@ -22,44 +22,38 @@ const FeatureCard = ({
 
   return (
     <motion.div
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.97 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       className="
         p-8
         rounded-3xl
-
         border
-        border-zinc-200
+        border-zinc-200/90
         dark:border-zinc-800
-
-        bg-zinc-50
+        bg-white
         dark:bg-zinc-900
-
+        shadow-sm
+        hover:shadow-xl
+        hover:shadow-green-900/5
+        dark:hover:shadow-black/30
         transition-all
         duration-300
-
         hover:border-[#0C831F]
         dark:hover:border-[#0C831F]
-        hover:shadow-xl
-        hover:shadow-black/5
-        dark:hover:shadow-black/20
       "
     >
       <div
         className="
           h-12
           w-12
-
-          rounded-xl
-
-          bg-zinc-200
-          dark:bg-zinc-800
+          rounded-2xl
+          bg-[#0C831F]/10
+          dark:bg-emerald-500/15
           text-[#0C831F]
-
+          dark:text-emerald-400
           flex
           items-center
           justify-center
-
           mb-6
         "
       >
@@ -68,9 +62,9 @@ const FeatureCard = ({
 
       <h3
         className="
-          text-2xl
-          font-semibold
-          mb-4
+          text-xl
+          font-bold
+          mb-3
           text-zinc-900
           dark:text-white
         "
@@ -83,6 +77,8 @@ const FeatureCard = ({
           text-zinc-600
           dark:text-zinc-400
           leading-relaxed
+          text-sm
+          lg:text-base
         "
       >
         {description}

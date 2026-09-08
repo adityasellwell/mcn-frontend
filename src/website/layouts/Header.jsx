@@ -95,28 +95,25 @@ const Header = () => {
             <div>
               <h1
                 className="
-                  text-lg
+                  text-base
                   font-bold
                   text-zinc-900
                   dark:text-white
-                  whitespace-nowrap
+                  leading-tight
                 "
               >
-                MCN
+                Muslim Community Network
               </h1>
 
               <p
                 className="
-                  hidden
-                  sm:block
-
                   text-xs
                   text-zinc-500
                   dark:text-zinc-400
                   whitespace-nowrap
                 "
               >
-                Muslim Community Network
+                MCN
               </p>
             </div>
           </Link>
