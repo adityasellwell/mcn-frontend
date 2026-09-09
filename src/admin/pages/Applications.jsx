@@ -154,16 +154,6 @@ const ApplicationModal = ({ application, onClose, onApprove, onReject, onDelete 
               Payment Information
             </p>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-[#6b7ea3] mb-1">Payment Method</p>
-                <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
-                  application.paymentMethod === "AT_VENUE"
-                    ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                    : "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                }`}>
-                  {application.paymentMethod === "AT_VENUE" ? "Unpaid — Pay at Venue" : "Online"}
-                </span>
-              </div>
               <Field
                 label="UTR Number"
                 value={application.utrNumber || "Not provided"}

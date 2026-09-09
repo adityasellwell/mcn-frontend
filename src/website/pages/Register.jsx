@@ -40,7 +40,6 @@ const Register = () => {
     screenshot: null,
     isBniMember: "",   // "yes" | "no" | "" (required for MEMBER)
     bniChapter: "",
-    paymentMethod: "", // "ONLINE" | "AT_VENUE" | ""
   });
 
   const [socialLinks, setSocialLinks] =
@@ -192,14 +191,6 @@ const handleSubmit = async (e) => {
   setLoading(true);
 
   try {
-    const isPayingOnline = formData.paymentMethod === "ONLINE";
-
-    // Only require payment proof for online payments
-    if (isPayingOnline && !formData.utrNumber && !formData.screenshot) {
-      toast.error("Please provide UTR Number or Payment Screenshot");
-      return;
-    }
-
     const validationErrors = {};
 
     if (!registrationType) {
@@ -260,13 +251,17 @@ const handleSubmit = async (e) => {
       }
     }
 
-    // ─── Payment method required ───
-    if (!formData.paymentMethod) {
-      validationErrors.paymentMethod = "Please select a payment method";
+    // ─── Payment Proof validation — Compulsory UTR & Screenshot ───
+    if (!formData.utrNumber.trim()) {
+      validationErrors.utrNumber = "12-Digit UTR Number is required";
+    }
+    if (!formData.screenshot) {
+      validationErrors.screenshot = "Payment Screenshot is required";
     }
 
     if (Object.keys(validationErrors).length) {
       setErrors(validationErrors);
+      toast.error("Please complete all required fields and payment proof");
       return;
     }
 
@@ -288,11 +283,11 @@ const handleSubmit = async (e) => {
       socialProfiles: socialLinks.filter((link) => link.platform && link.url),
       address: formData.address,
       referredBy: registrationType === "VISITOR" ? formData.referredBy || null : null,
-      utrNumber: isPayingOnline ? formData.utrNumber || null : null,
-      screenshot: isPayingOnline ? formData.screenshot : null,
+      utrNumber: formData.utrNumber.trim(),
+      screenshot: formData.screenshot,
       isBniMember: formData.isBniMember === "yes",
       bniChapter: formData.isBniMember === "yes" ? formData.bniChapter : null,
-      paymentMethod: formData.paymentMethod,
+      paymentMethod: "ONLINE",
     };
 
     const response = await createApplication(payload);
@@ -1129,153 +1124,99 @@ useEffect(() => {
           />
         )}
 
-        {/* Payment Method Selection */}
+        {/* Compulsory Payment Section — QR + Proof */}
+        <div
+          className="
+            md:col-span-2
+            border
+            border-zinc-200
+            dark:border-zinc-800
+            rounded-2xl
+            p-6
+            bg-zinc-50/50
+            dark:bg-zinc-950
+            text-center
+          "
+        >
+          <h3 className="text-zinc-900 dark:text-white font-semibold text-lg">
+            Registration Fee
+          </h3>
 
-        <div className="md:col-span-2">
-          <p className="text-zinc-900 dark:text-white font-medium mb-3">
-            How would you like to pay? <span className="text-red-500">*</span>
+          <p className="text-green-500 text-3xl font-bold mt-2">
+            ₹{selectedMeeting?.meetingFee ? Number(selectedMeeting.meetingFee) : 1000}
           </p>
-          <div className="grid sm:grid-cols-2 gap-3">
-            <label
-              className={`flex items-start gap-3 border rounded-xl p-4 cursor-pointer transition-all ${
-                formData.paymentMethod === "ONLINE"
-                  ? "border-[#0C831F] bg-green-50 dark:bg-green-950/20"
-                  : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500"
-              }`}
-            >
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="ONLINE"
-                checked={formData.paymentMethod === "ONLINE"}
-                onChange={handleChange}
-                className="accent-[#0C831F] mt-0.5 w-4 h-4 shrink-0"
-              />
-              <div>
-                <p className="text-zinc-900 dark:text-white font-medium text-sm">Pay Now (Online)</p>
-                <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-0.5">Scan QR & upload payment screenshot or UTR</p>
-              </div>
-            </label>
 
-            <label
-              className={`flex items-start gap-3 border rounded-xl p-4 cursor-pointer transition-all ${
-                formData.paymentMethod === "AT_VENUE"
-                  ? "border-amber-500 bg-amber-50 dark:bg-amber-950/20"
-                  : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500"
-              }`}
-            >
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="AT_VENUE"
-                checked={formData.paymentMethod === "AT_VENUE"}
-                onChange={handleChange}
-                className="accent-amber-500 mt-0.5 w-4 h-4 shrink-0"
-              />
-              <div>
-                <p className="text-zinc-900 dark:text-white font-medium text-sm">Pay at the Venue</p>
-                <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-0.5">Bring cash on the meeting day</p>
-              </div>
-            </label>
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-2">
+            Scan the QR code to complete your payment, then enter UTR number and upload receipt below.
+          </p>
+
+          <div className="w-full max-w-md mx-auto mt-5 rounded-xl overflow-hidden">
+            <img
+              src={qrImage}
+              alt="QR Code"
+              className="w-64 h-64 object-contain mx-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white p-3 shadow-md"
+            />
           </div>
-          {errors.paymentMethod && (
-            <p className="text-red-500 text-sm mt-2">{errors.paymentMethod}</p>
-          )}
         </div>
 
-        {/* Pay Now — QR + proof */}
-        {formData.paymentMethod === "ONLINE" && (
-          <>
-            <div
-              className="
-                md:col-span-2
-                border
-                border-zinc-200
-                dark:border-zinc-800
-                rounded-2xl
-                p-5
-                bg-zinc-100/50
-                dark:bg-zinc-950
-                text-center
-              "
-            >
-              <h3 className="text-zinc-900 dark:text-white font-semibold text-lg">
-                Registration Fee
-              </h3>
+        {/* Screenshot upload and UTR Section — Compulsory */}
+        <div className="md:col-span-2">
+          <h4 className="text-zinc-900 dark:text-white font-medium mb-1">
+            Payment Proof <span className="text-red-500">*</span>
+          </h4>
+          <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4">
+            Both UTR Number and Payment Screenshot are mandatory for application submission.
+          </p>
+        </div>
 
-              <p className="text-green-500 text-3xl font-bold mt-2">
-                ₹{selectedMeeting?.meetingFee ? Number(selectedMeeting.meetingFee) : 1000}
-              </p>
-
-              <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-2">
-                Scan the QR code and complete your payment.
-              </p>
-
-              <div className="w-full max-w-md mx-auto mt-5 rounded-xl overflow-hidden">
-                <img
-                  src={qrImage}
-                  alt="QR"
-                  className="w-64 h-64 object-contain mx-auto rounded-xl"
-                />
-              </div>
-            </div>
-
-            {/* Screenshot upload and UTR Section*/}
-            <div className="md:col-span-2">
-              <h4 className="text-zinc-900 dark:text-white font-medium mb-3">
-                Payment Proof
-              </h4>
-              <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4">
-                Upload Screenshot or Enter UTR Number (either one is required)
-              </p>
-            </div>
-
-            <div className="md:col-span-2 grid md:grid-cols-2 gap-4">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="
-                  input
-                  text-zinc-700
-                  dark:text-white
-                  file:mr-4
-                  file:py-2
-                  file:px-4
-                  file:rounded-lg
-                  file:border-0
-                  file:bg-[#0C831F]
-                  file:text-white
-                "
-                onChange={handleFileChange}
-              />
-
-              <input
-                type="text"
-                name="utrNumber"
-                placeholder="Enter UTR Number"
-                className="input"
-                value={formData.utrNumber}
-                onChange={handleChange}
-              />
-            </div>
-          </>
-        )}
-
-        {/* Pay at Venue — confirmation message */}
-        {formData.paymentMethod === "AT_VENUE" && (
-          <div className="md:col-span-2 border border-amber-400 dark:border-amber-600 rounded-xl p-5 bg-amber-50 dark:bg-amber-950/20">
-            <h3 className="text-amber-700 dark:text-amber-400 font-semibold">
-              Pay at the Venue
-            </h3>
-            <p className="text-amber-800 dark:text-amber-300 text-sm mt-2 leading-relaxed">
-              You have chosen to pay at the venue. Please carry{" "}
-              <strong>₹{selectedMeeting?.meetingFee ? Number(selectedMeeting.meetingFee) : 1000}</strong>{" "}
-              cash on the meeting day. Your registration will be marked as{" "}
-              <strong>Pending Payment</strong> until confirmed by the admin.
-            </p>
+        <div className="md:col-span-2 grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs text-zinc-600 dark:text-zinc-400 mb-1.5 font-medium">
+              12-Digit UTR Number <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="utrNumber"
+              placeholder="Enter 12-Digit UTR Number"
+              className="input"
+              value={formData.utrNumber}
+              onChange={handleChange}
+              required
+            />
+            {errors.utrNumber && (
+              <p className="text-red-500 text-xs mt-1">{errors.utrNumber}</p>
+            )}
           </div>
-        )}
+
+          <div>
+            <label className="block text-xs text-zinc-600 dark:text-zinc-400 mb-1.5 font-medium">
+              Payment Screenshot <span className="text-red-500">*</span>
+            </label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              required
+              className="
+                input
+                text-zinc-700
+                dark:text-white
+                file:mr-4
+                file:py-2
+                file:px-4
+                file:rounded-lg
+                file:border-0
+                file:bg-[#0C831F]
+                file:text-white
+                file:cursor-pointer
+              "
+              onChange={handleFileChange}
+            />
+            {errors.screenshot && (
+              <p className="text-red-500 text-xs mt-1">{errors.screenshot}</p>
+            )}
+          </div>
+        </div>
 
 
 

@@ -24,15 +24,12 @@ import {
 import toast from "react-hot-toast";
 
 /**
- * Modal for registering for a meeting & selecting payment method (Online vs Pay at Venue)
+ * Modal for registering for a meeting & submitting compulsory payment proof (QR + UTR + Screenshot)
  */
 const MeetingModal = ({ meeting, onClose, onSuccess }) => {
   const reg = meeting.registration;
   const isAlreadyRegistered = !!reg;
 
-  const [paymentMethod, setPaymentMethod] = useState(
-    reg?.utrNumber === "AT_VENUE" ? "AT_VENUE" : "ONLINE"
-  );
   const [utrNumber, setUtrNumber] = useState(
     reg?.utrNumber && reg.utrNumber !== "AT_VENUE" ? reg.utrNumber : ""
   );
@@ -51,8 +48,13 @@ const MeetingModal = ({ meeting, onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (paymentMethod === "ONLINE" && !screenshot && !utrNumber.trim()) {
-      toast.error("Please upload a payment screenshot or enter a UTR number");
+    if (!utrNumber.trim()) {
+      toast.error("Please enter the UTR Number");
+      return;
+    }
+
+    if (!screenshot) {
+      toast.error("Please upload the Payment Screenshot");
       return;
     }
 
@@ -63,17 +65,13 @@ const MeetingModal = ({ meeting, onClose, onSuccess }) => {
         await registerPortalMeeting(meeting.id);
       }
 
-      // Step 2: Upload payment method/proof
+      // Step 2: Upload payment proof (UTR + Screenshot)
       const formData = new FormData();
-      formData.append("paymentMethod", paymentMethod);
-
-      if (paymentMethod === "ONLINE") {
-        if (screenshot) formData.append("paymentScreenshot", screenshot);
-        if (utrNumber.trim()) formData.append("utrNumber", utrNumber.trim());
-      }
+      formData.append("utrNumber", utrNumber.trim());
+      formData.append("paymentScreenshot", screenshot);
 
       const res = await uploadPortalMeetingPayment(meeting.id, formData);
-      toast.success(res.data?.message || "Registration updated successfully!");
+      toast.success(res.data?.message || "Registration & payment proof submitted successfully!");
       onSuccess();
       onClose();
     } catch (err) {
@@ -95,10 +93,10 @@ const MeetingModal = ({ meeting, onClose, onSuccess }) => {
             </div>
             <div>
               <h3 className="text-lg font-bold text-white leading-snug">
-                {isAlreadyRegistered ? "Update Meeting Registration" : "Register for Meeting"}
+                {isAlreadyRegistered ? "Submit Payment Proof" : "Register for Meeting"}
               </h3>
               <p className="text-xs text-zinc-400">
-                {meeting.chapter?.name ? `${meeting.chapter.name} · ` : ""}Event Details &amp; Registration
+                {meeting.chapter?.name ? `${meeting.chapter.name} · ` : ""}Event Registration &amp; Payment
               </p>
             </div>
           </div>
@@ -173,106 +171,49 @@ const MeetingModal = ({ meeting, onClose, onSuccess }) => {
             )}
           </div>
 
-          {/* Payment Method Selection */}
-          <div className="space-y-3">
-            <label className="block text-xs font-bold text-zinc-200 uppercase tracking-wider">
-              Select How You Wish To Pay <span className="text-red-400">*</span>
-            </label>
-            <div className="grid sm:grid-cols-2 gap-3">
-              <label
-                className={`flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition-all ${
-                  paymentMethod === "ONLINE"
-                    ? "border-[#22C55E] bg-green-950/30 text-white shadow-lg shadow-green-950/20"
-                    : "border-zinc-800 bg-zinc-950/90 text-zinc-400 hover:border-zinc-700"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="ONLINE"
-                  checked={paymentMethod === "ONLINE"}
-                  onChange={() => setPaymentMethod("ONLINE")}
-                  className="accent-[#22C55E] mt-1 w-4 h-4 shrink-0"
-                />
-                <div>
-                  <p className="text-sm font-bold text-white">Pay Now (Online)</p>
-                  <p className="text-xs text-zinc-400 mt-0.5">Scan QR Code &amp; upload receipt or UTR number</p>
-                </div>
-              </label>
+          {/* Compulsory Payment Section */}
+          <div className="bg-zinc-950/90 border border-zinc-800 rounded-2xl p-5 space-y-5">
+            <div className="text-center space-y-2">
+              <p className="text-xs text-zinc-300 font-medium">
+                Scan QR Code to pay <span className="text-[#22C55E] font-bold">₹{feeAmount.toLocaleString("en-IN")}</span>
+              </p>
+              <img
+                src={qrImage}
+                alt="QR Code"
+                className="h-48 w-48 object-contain mx-auto rounded-xl border border-zinc-700 bg-white p-2.5 shadow-md"
+              />
+            </div>
 
-              <label
-                className={`flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition-all ${
-                  paymentMethod === "AT_VENUE"
-                    ? "border-amber-500 bg-amber-950/30 text-white shadow-lg shadow-amber-950/20"
-                    : "border-zinc-800 bg-zinc-950/90 text-zinc-400 hover:border-zinc-700"
-                }`}
-              >
+            <div className="grid sm:grid-cols-2 gap-4 pt-2">
+              <div>
+                <label className="block text-xs font-semibold text-zinc-200 mb-1.5">
+                  12-Digit UTR Number <span className="text-red-400">*</span>
+                </label>
                 <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="AT_VENUE"
-                  checked={paymentMethod === "AT_VENUE"}
-                  onChange={() => setPaymentMethod("AT_VENUE")}
-                  className="accent-amber-500 mt-1 w-4 h-4 shrink-0"
+                  type="text"
+                  placeholder="Enter UTR / Transaction ID"
+                  value={utrNumber}
+                  onChange={(e) => setUtrNumber(e.target.value)}
+                  required
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-zinc-600 outline-none focus:border-[#22C55E] transition"
                 />
-                <div>
-                  <p className="text-sm font-bold text-white">Pay at Venue</p>
-                  <p className="text-xs text-zinc-400 mt-0.5">Pay ₹{feeAmount.toLocaleString("en-IN")} cash at the event venue</p>
-                </div>
-              </label>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-zinc-200 mb-1.5">
+                  Payment Screenshot <span className="text-red-400">*</span>
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setScreenshot(e.target.files[0])}
+                  required
+                  className="w-full text-zinc-400 text-xs file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-zinc-800 file:text-zinc-200 file:cursor-pointer hover:file:bg-zinc-700 transition"
+                />
+              </div>
             </div>
           </div>
-
-          {/* Pay Now Inputs */}
-          {paymentMethod === "ONLINE" && (
-            <div className="bg-zinc-950/90 border border-zinc-800 rounded-2xl p-5 space-y-5">
-              <div className="text-center space-y-2">
-                <p className="text-xs text-zinc-300 font-medium">Scan QR Code to pay <span className="text-[#22C55E] font-bold">₹{feeAmount.toLocaleString("en-IN")}</span></p>
-                <img
-                  src={qrImage}
-                  alt="QR Code"
-                  className="h-48 w-48 object-contain mx-auto rounded-xl border border-zinc-700 bg-white p-2.5 shadow-md"
-                />
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-4 pt-2">
-                <div>
-                  <label className="block text-xs font-medium text-zinc-300 mb-1.5">12-Digit UTR Number</label>
-                  <input
-                    type="text"
-                    placeholder="Enter UTR / Txn ID"
-                    value={utrNumber}
-                    onChange={(e) => setUtrNumber(e.target.value)}
-                    className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-zinc-600 outline-none focus:border-[#22C55E] transition"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-zinc-300 mb-1.5">Payment Screenshot</label>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setScreenshot(e.target.files[0])}
-                    className="w-full text-zinc-400 text-xs file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-zinc-800 file:text-zinc-200 file:cursor-pointer hover:file:bg-zinc-700 transition"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Pay at Venue Confirmation */}
-          {paymentMethod === "AT_VENUE" && (
-            <div className="bg-amber-950/20 border border-amber-500/30 rounded-2xl p-5 space-y-2">
-              <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
-                <Building2 size={18} />
-                <span>Pay Cash at Venue</span>
-              </div>
-              <p className="text-xs text-amber-200/90 leading-relaxed">
-                Your registration will be recorded. Please carry <strong>₹{feeAmount.toLocaleString("en-IN")}</strong> cash on the meeting day ({dateFormatted}).
-              </p>
-            </div>
-          )}
 
           {/* Submit Button */}
           <button
@@ -281,15 +222,13 @@ const MeetingModal = ({ meeting, onClose, onSuccess }) => {
             className="w-full py-3.5 bg-[#0C831F] hover:bg-[#0A6F1A] disabled:opacity-60 text-white font-bold text-sm rounded-2xl transition shadow-lg shadow-green-950/40 flex items-center justify-center gap-2"
           >
             {submitting && <Loader2 size={16} className="animate-spin" />}
-            {paymentMethod === "ONLINE"
-              ? isAlreadyRegistered ? "Submit Payment Proof" : "Register & Submit Payment Proof"
-              : isAlreadyRegistered ? "Confirm Pay at Venue" : "Register & Pay at Venue"
-            }
+            {isAlreadyRegistered ? "Submit Payment Proof" : "Register & Submit Payment Proof"}
           </button>
         </form>
       </div>
     </div>
   );
+};
 };
 
 const Meetings = () => {
