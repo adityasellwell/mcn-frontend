@@ -229,7 +229,6 @@ const MeetingModal = ({ meeting, onClose, onSuccess }) => {
     </div>
   );
 };
-};
 
 const Meetings = () => {
   usePageTitle("My Meetings - MCN Portal");
@@ -268,13 +267,6 @@ const Meetings = () => {
 
   const getPaymentBadge = (reg) => {
     if (!reg) return null;
-    if (reg.utrNumber === "AT_VENUE" && reg.paymentStatus === "PENDING") {
-      return (
-        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-400">
-          Pay at Venue (Pending)
-        </span>
-      );
-    }
     switch (reg.paymentStatus) {
       case "PENDING":
         return (
