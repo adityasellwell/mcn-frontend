@@ -9,6 +9,7 @@ import {
   deleteReferral,
 } from "../services/referralService";
 import { fetchMembers } from "../services/memberService";
+import SearchableMemberSelect from "../../components/SearchableMemberSelect";
 import ConfirmModal from "../components/ConfirmModal";
 import toast from "react-hot-toast";
 
@@ -104,37 +105,27 @@ const CreateModal = ({ members, onClose, onSave }) => {
           {/* Given By */}
           <div>
             <label className="block text-xs text-[#6b7ea3] mb-1.5">Given By *</label>
-            <select
-              name="givenByMemberId"
+            <SearchableMemberSelect
+              members={members}
               value={form.givenByMemberId}
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 rounded-xl bg-[#162040] border border-white/10 text-sm text-white focus:outline-none focus:border-white/20 transition"
-            >
-              <option value="">Select Member</option>
-              {members.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.firstName} {m.lastName} — {m.memberCode}
-                </option>
-              ))}
-            </select>
+              onChange={(id) => setForm({ ...form, givenByMemberId: id })}
+              placeholder="Select Member"
+              variant="admin"
+              required
+            />
           </div>
 
           {/* Received By */}
           <div>
             <label className="block text-xs text-[#6b7ea3] mb-1.5">Received By *</label>
-            <select
-              name="receivedByMemberId"
+            <SearchableMemberSelect
+              members={members}
               value={form.receivedByMemberId}
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 rounded-xl bg-[#162040] border border-white/10 text-sm text-white focus:outline-none focus:border-white/20 transition"
-            >
-              <option value="">Select Member</option>
-              {members.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.firstName} {m.lastName} — {m.memberCode}
-                </option>
-              ))}
-            </select>
+              onChange={(id) => setForm({ ...form, receivedByMemberId: id })}
+              placeholder="Select Member"
+              variant="admin"
+              required
+            />
           </div>
 
           {/* Title */}

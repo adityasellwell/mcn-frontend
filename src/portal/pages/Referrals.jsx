@@ -6,6 +6,7 @@ import {
   createPortalReferral,
   getPortalMembers,
 } from "../../services/portalReferralService";
+import SearchableMemberSelect from "../../components/SearchableMemberSelect";
 import {
   Handshake,
   ArrowUpRight,
@@ -246,22 +247,14 @@ const Referrals = () => {
                 <label className="block text-sm text-zinc-400 mb-1.5 font-medium">
                   Select Member <span className="text-red-500">*</span>
                 </label>
-                <select
-                  required
+                <SearchableMemberSelect
+                  members={members}
                   value={receivedByMemberId}
-                  onChange={(e) => setReceivedByMemberId(e.target.value)}
-                  className="
-                    w-full bg-zinc-950 border border-zinc-800 rounded-xl
-                    px-4 py-2.5 text-sm text-white outline-none focus:border-[#0C831F]
-                  "
-                >
-                  <option value="">Choose a Member</option>
-                  {members.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.firstName} {m.lastName || ""} ({m.memberCode})
-                    </option>
-                  ))}
-                </select>
+                  onChange={(id) => setReceivedByMemberId(id)}
+                  placeholder="Choose a Member"
+                  variant="portal"
+                  required
+                />
               </div>
 
               <div>

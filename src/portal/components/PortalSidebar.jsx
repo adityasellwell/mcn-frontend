@@ -103,17 +103,20 @@ const PortalSidebar = ({ isOpen, setIsOpen, isCollapsed, setIsCollapsed }) => {
             </NavLink>
           );
         })}
-      </nav>
 
-      <div className="p-4 border-t border-zinc-800">
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 bg-zinc-800/50 hover:bg-zinc-800 text-zinc-300 text-sm font-medium py-2.5 rounded-lg border border-zinc-700 transition-all"
-        >
-          <LogOut size={16} />
-          {!isCollapsed && "Logout"}
-        </button>
-      </div>
+        <div className="pt-2 border-t border-zinc-800/80 mt-2">
+          <button
+            onClick={handleLogout}
+            className={`group relative flex items-center w-full ${isCollapsed ? "justify-center px-2" : "gap-3 px-3.5"} py-2.5 rounded-lg text-sm font-medium text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-200`}
+          >
+            <LogOut
+              size={18}
+              className="text-zinc-500 group-hover:text-rose-400 transition-colors shrink-0"
+            />
+            {!isCollapsed && <span>Logout</span>}
+          </button>
+        </div>
+      </nav>
     </aside>
   );
 };

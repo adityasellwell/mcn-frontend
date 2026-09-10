@@ -105,17 +105,20 @@ const handleLogout = () => {
             </NavLink>
           );
         })}
-      </nav>
 
-      <div className="p-4 border-t border-white/5">
-        <button
+        <div className="pt-2 border-t border-white/10 mt-2">
+          <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 bg-white/[0.04] hover:bg-white/[0.08] text-[#e8edf3] text-sm font-medium py-2.5 rounded-lg border border-white/10 transition-all"
+            className={`group relative flex items-center w-full ${isCollapsed ? "justify-center px-2" : "gap-3 px-3.5"} py-2.5 rounded-lg text-sm font-medium text-[#a8b8d4] hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-200`}
           >
-            <LogOut size={16} />
-            {isCollapsed ? "" : "Logout"}
+            <LogOut
+              size={18}
+              className="text-[#6b7ea3] group-hover:text-rose-400 transition-colors shrink-0"
+            />
+            {!isCollapsed && <span>Logout</span>}
           </button>
-      </div>
+        </div>
+      </nav>
     </aside>
   );
 };
