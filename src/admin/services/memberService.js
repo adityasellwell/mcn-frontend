@@ -23,3 +23,7 @@ export const updateMemberStatus = (id, status) =>
 // ─── Deactivate member ───
 export const deleteMember = (id) =>
   api.delete(`/member/${id}`);
+
+// ─── Export members to Excel ───
+export const exportMembers = (params) =>
+  api.get("/member/export", { params, responseType: "blob" });

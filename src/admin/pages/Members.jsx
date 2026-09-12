@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import usePageTitle from "../../hooks/usePageTitle";
-import { Plus, Pencil, Eye, UserX, X, Users, Trash2, LogIn } from "lucide-react";
+import { Plus, Pencil, Eye, UserX, X, Users, Trash2, LogIn, Download } from "lucide-react";
 import {
   fetchMembers,
   fetchMemberById,
@@ -8,6 +8,7 @@ import {
   updateMember,
   updateMemberStatus,
   deleteMember,
+  exportMembers,
 } from "../services/memberService";
 import { fetchChapters } from "../services/chapterService";
 import { openPortalAsUser } from "../services/portalImpersonationService";
@@ -539,6 +540,23 @@ const Members = () => {
     }
   };
 
+  // ─── Export Excel ───
+  const handleExport = async () => {
+    try {
+      const res = await exportMembers();
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "members.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success("Export downloaded");
+    } catch {
+      toast.error("Export failed");
+    }
+  };
+
   return (
     <>
       <div className="space-y-6">
@@ -549,13 +567,22 @@ const Members = () => {
             <h2 className="text-2xl font-bold text-white">Members</h2>
             <p className="text-sm text-[#6b7ea3] mt-1">Manage MCN members</p>
           </div>
-          <button
-            onClick={() => { setEditTarget(null); setModalOpen(true); }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-sm text-white font-medium transition"
-          >
-            <Plus size={16} />
-            Add Member
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#162040] hover:bg-[#1e2d55] border border-white/10 text-sm text-white font-medium transition"
+            >
+              <Download size={16} />
+              Export Excel
+            </button>
+            <button
+              onClick={() => { setEditTarget(null); setModalOpen(true); }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-sm text-white font-medium transition"
+            >
+              <Plus size={16} />
+              Add Member
+            </button>
+          </div>
         </div>
 
         {/* ── Table ── */}
